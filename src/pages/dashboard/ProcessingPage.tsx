@@ -17,11 +17,10 @@ interface Step {
 
 const STEPS: Step[] = [
   { id: 0, icon: Upload,        label: 'Uploading',           sublabel: 'Transferring your video securely...', duration: 3 },
-  { id: 1, icon: DownloadCloud, label: 'Downloading',         sublabel: 'Fetching video from source URL...', duration: 4 },
+  { id: 1, icon: Scissors,      label: 'Generating Clips',    sublabel: 'Extracting clips based on duration...', duration: 6 },
   { id: 2, icon: Mic2,          label: 'Transcribing',        sublabel: 'Processing audio and preparing captions...', duration: 5 },
-  { id: 3, icon: Scissors,      label: 'Generating Clips',    sublabel: 'Extracting clips based on duration...', duration: 6 },
-  { id: 4, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
-  { id: 5, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
+  { id: 3, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
+  { id: 4, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
 ]
 
 type StepState = 'pending' | 'active' | 'done' | 'error'
@@ -105,7 +104,7 @@ export function ProcessingPage() {
   const { jobId } = useParams()
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
-  const [stepStates, setStepStates] = useState<StepState[]>(['active', 'pending', 'pending', 'pending', 'pending', 'pending'])
+  const [stepStates, setStepStates] = useState<StepState[]>(['active', 'pending', 'pending', 'pending', 'pending'])
   const [stepProgress, setStepProgress] = useState(0)
   const [overallProgress, setOverallProgress] = useState(0)
   const [elapsed, setElapsed] = useState(0)
@@ -142,11 +141,10 @@ export function ProcessingPage() {
           // Map string steps to UI indices
           const stepMap: Record<string, number> = {
             'uploading': 0,
-            'downloading': 1,
+            'generating_clips': 1,
             'transcribing': 2,
-            'generating_clips': 3,
-            'generating_metadata': 4,
-            'completed': 5
+            'generating_metadata': 3,
+            'completed': 4
           }
 
           const activeIndex = data.current_step && stepMap[data.current_step] !== undefined
@@ -166,13 +164,13 @@ export function ProcessingPage() {
               else next[i] = 'pending'
             }
             // If completed
-            if (data.status === 'completed' || activeIndex >= 5) {
-              next[5] = 'done'
+            if (data.status === 'completed' || activeIndex >= 4) {
+              next[4] = 'done'
             }
             return next
           })
 
-          if (data.status === 'completed' || activeIndex >= 5) {
+          if (data.status === 'completed' || activeIndex >= 4) {
             setCompleted(true)
             setOverallProgress(100)
             setTimeout(() => navigate('/dashboard/clips'), 2500)
@@ -333,20 +331,20 @@ export function ProcessingPage() {
                   {/* Sub-label / animation */}
                   {isActive && (
                     <div className="mt-1">
-                      {i === 2 ? (
+                      {i === 1 ? (
+                        <ClipMaterializeAnimation />
+                      ) : i === 2 ? (
                         <WaveformAnimation />
                       ) : i === 3 ? (
-                        <ClipMaterializeAnimation />
-                      ) : i === 4 ? (
                         <TypingAnimation text="Generating: '5 AI Trends Changing Content Creation in 2024...'" />
-                      ) : i === 5 ? (
+                      ) : i === 4 ? (
                         <SuccessBurst />
                       ) : (
                         <p className="text-xs text-[#9E9E9E]">{step.sublabel}</p>
                       )}
 
                       {/* Step progress bar */}
-                      {i !== 5 && (
+                      {i !== 4 && (
                         <div className="mt-2 h-0.5 rounded-full bg-[#FFCDD2] overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-[#EF5350]"

@@ -1,6 +1,6 @@
 export type Plan = 'free' | 'starter' | 'creator' | 'agency'
 export type JobStatus = 'queued' | 'running' | 'completed' | 'cancelled' | 'failed'
-export type JobStep = 'uploading' | 'downloading' | 'transcribing' | 'generating_clips' | 'generating_metadata' | 'completed'
+export type JobStep = 'uploading' | 'generating_clips' | 'transcribing' | 'generating_metadata' | 'completed'
 export type ClipStatus = 'processing' | 'ready' | 'failed'
 
 export interface User {

@@ -23,7 +23,7 @@ export function ClipDetail() {
   useEffect(() => {
     const fetchClip = async () => {
       try {
-        const res = await api.get(`/v2/videos/clips/${id}`)
+        const res = await api.get(`/v2/clips/${id}`)
         if (res.data.success && res.data.data) {
           const c = res.data.data
           setClip(c)

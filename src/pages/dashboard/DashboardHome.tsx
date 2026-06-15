@@ -14,16 +14,25 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/api";
-import { Video } from "@/types";
+import { Clip } from "@/types";
+import { VideoThumbnail } from "./ClipsPage";
+
+interface DashboardStats {
+  storage_used_bytes: number;
+  storage_quota_bytes: number;
+  storage_used_percent: number;
+  total_videos: number;
+  total_clips: number;
+  active_jobs: number;
+}
 
 export function DashboardHome() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  // We fetch videos to populate stats and potentially map video names to jobs if possible
-  const [videos, setVideos] = useState<Video[]>([]);
-  // We fetch jobs to populate the recent jobs table
+  const [statsData, setStatsData] = useState<DashboardStats | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [clips, setClips] = useState<Clip[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,22 +40,17 @@ export function DashboardHome() {
 
     const fetchData = async () => {
       try {
-        const [videosRes, jobsRes] = await Promise.all([
-          api.get('/v2/videos'),
-          api.get('/v2/jobs')
-        ]);
+        const res = await api.get('/v1/users/dashboard/overview');
         
         if (!mounted) return;
 
-        if (videosRes.data.success && videosRes.data.data?.data) {
-          setVideos(videosRes.data.data.data);
-        }
-        
-        if (jobsRes.data.success && jobsRes.data.data?.data) {
-          setJobs(jobsRes.data.data.data);
+        if (res.data.success && res.data.data) {
+          setStatsData(res.data.data.stats);
+          setJobs(res.data.data.recent_jobs || []);
+          setClips(res.data.data.recent_clips || []);
         }
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
+        console.error("Failed to fetch dashboard overview:", err);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -54,54 +58,63 @@ export function DashboardHome() {
 
     fetchData(); // Initial fetch
     
-    // Poll every 5s to keep dashboard jobs table live
-    const iv = setInterval(fetchData, 5000);
+    // Poll every 20 minutes (20 * 60 * 1000 ms) as specified
+    const iv = setInterval(fetchData, 1200000);
     return () => {
       mounted = false;
       clearInterval(iv);
     };
   }, []);
 
-  // Calculate some temporary dynamic stats until /v2/users/stats exists
-  const totalUploads = videos.length;
-  const totalClips = videos.reduce((acc, v) => acc + (v.total_clips || 0), 0);
-  const activeJobs = jobs.filter(j => j.status === 'running' || j.status === 'queued' || j.status === 'uploading' || j.status === 'downloading' || j.status === 'transcribing' || j.status === 'generating_clips' || j.status === 'generating_metadata').length;
+  const formatStorage = (bytes: number) => {
+    if (!bytes) return "0 GB";
+    const gb = bytes / (1024 * 1024 * 1024);
+    return `${gb.toFixed(2)} GB`;
+  };
 
   const stats = [
     {
       icon: Upload,
       label: "Total Uploads",
-      value: loading ? "-" : totalUploads.toString(),
+      value: loading || !statsData ? "-" : statsData.total_videos.toString(),
       sub: "Across all projects",
       color: "#EF5350",
     },
     {
       icon: Film,
       label: "Generated Clips",
-      value: loading ? "-" : totalClips.toString(),
+      value: loading || !statsData ? "-" : statsData.total_clips.toString(),
       sub: "Ready to publish",
       color: "#C62828",
     },
     {
       icon: Zap,
       label: "Active Jobs",
-      value: loading ? "-" : activeJobs.toString(),
+      value: loading || !statsData ? "-" : statsData.active_jobs.toString(),
       sub: "Currently processing",
       color: "#22C55E",
     },
     {
       icon: HardDrive,
       label: "Storage Used",
-      value: "N/A",
-      sub: "Pending API",
+      value: loading || !statsData ? "-" : formatStorage(statsData.storage_used_bytes),
+      sub: loading || !statsData ? "..." : `of ${formatStorage(statsData.storage_quota_bytes)} (${Math.round(statsData.storage_used_percent)}%)`,
       color: "#F59E0B",
     },
   ];
 
-  const getStatusConfig = (status: string) => {
+  const getStatusConfig = (job: any) => {
+    const status = job.status;
     if (status === 'completed') return { icon: CheckCircle, label: "Completed", color: "text-[#22C55E]", bg: "bg-[#22C55E]/10" };
     if (status === 'failed' || status === 'cancelled') return { icon: AlertCircle, label: status.charAt(0).toUpperCase() + status.slice(1), color: "text-[#EF4444]", bg: "bg-[#EF4444]/10" };
-    return { icon: Loader, label: "Processing", color: "text-[#F59E0B]", bg: "bg-[#F59E0B]/10", animate: true };
+    
+    let label = "Processing";
+    if (job.current_step) {
+      const stepName = job.current_step.replace('_', ' ');
+      label = `${stepName.charAt(0).toUpperCase() + stepName.slice(1)} ${job.overall_progress ? `(${job.overall_progress}%)` : ''}`;
+    }
+
+    return { icon: Loader, label, color: "text-[#F59E0B]", bg: "bg-[#F59E0B]/10", animate: true };
   };
 
   const handleJobClick = (job: any) => {
@@ -155,6 +168,40 @@ export function DashboardHome() {
         ))}
       </div>
 
+      {/* Recent Clips */}
+      {clips.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-[#1A1A1A]">Recent Clips</h2>
+            <Link to="/dashboard/clips" className="flex items-center gap-1 text-xs text-[#EF5350] hover:underline font-medium">
+              View all <ArrowRight size={12} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {clips.slice(0, 4).map((clip, i) => (
+              <motion.div
+                key={clip.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#1A1A1A] border border-[#FFCDD2] shadow-sm hover:shadow-lg transition-all cursor-pointer"
+                onClick={() => navigate(`/dashboard/clips/${clip.id}`)}
+              >
+                <div className="absolute inset-0 z-0">
+                  <VideoThumbnail src={clip.playback_url || ''} fallbackColor="#222" />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 z-20 pointer-events-none">
+                  <p className="text-white text-sm font-semibold line-clamp-2 leading-snug">
+                    {clip.ai_title || "Generated Clip"}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Recent jobs */}
       <div className="bg-[#FFFFFF] border border-[#FFCDD2] border-t-2 border-t-[#EF5350] rounded-lg overflow-hidden shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#FFCDD2]">
@@ -181,7 +228,7 @@ export function DashboardHome() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#FFCDD2]">
-                  {["Job ID / Video", "Status", "Clips", "Created", "Action"].map(
+                  {["Job ID", "Status", "Clips", "Created", "Action"].map(
                     (h) => (
                       <th
                         key={h}
@@ -194,11 +241,9 @@ export function DashboardHome() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.slice(0, 8).map((job, i) => {
-                  const s = getStatusConfig(job.status);
-                  // Find the corresponding video title if possible
-                  const parentVideo = videos.find(v => v.id === job.video_id);
-                  const titleDisplay = parentVideo ? parentVideo.title : `Job ${job.job_id?.slice(0, 8) || job.id?.slice(0, 8)}`;
+                {jobs.map((job, i) => {
+                  const s = getStatusConfig(job);
+                  const titleDisplay = `Job ${job.job_id?.slice(0, 8) || job.id?.slice(0, 8)}`;
                   
                   return (
                     <motion.tr
@@ -214,7 +259,7 @@ export function DashboardHome() {
                           <div className="w-8 h-8 rounded-lg bg-[#EF5350]/15 flex items-center justify-center flex-shrink-0">
                             <Film size={14} className="text-[#EF5350]" />
                           </div>
-                          <span className="text-sm text-[#1A1A1A] truncate max-w-[200px] group-hover:text-[#EF5350] transition-colors">
+                          <span className="text-sm text-[#1A1A1A] truncate max-w-[200px] group-hover:text-[#EF5350] transition-colors font-medium">
                             {titleDisplay}
                           </span>
                         </div>
@@ -240,7 +285,7 @@ export function DashboardHome() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-xs text-[#EF5350] font-medium group-hover:underline">
-                          {job.status === "completed" ? "View Clips" : "View Progress"}
+                          {job.status === 'completed' ? "View Clips" : "View Progress"}
                         </span>
                       </td>
                     </motion.tr>

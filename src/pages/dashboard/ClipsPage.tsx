@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { Clip } from '@/types'
 
 // Dynamic thumbnail generator
-function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackColor: string }) {
+export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackColor: string }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [thumb, setThumb] = useState<string | null>(null)
@@ -66,7 +66,7 @@ export function ClipsPage() {
   useEffect(() => {
     const fetchClips = async () => {
       try {
-        const url = videoId ? `/v2/videos/clips?video_id=${videoId}` : '/v2/videos/clips'
+        const url = videoId ? `/v2/clips?video_id=${videoId}` : '/v2/clips'
         const res = await api.get(url)
         if (res.data.success && res.data.data?.data) {
           setClips(res.data.data.data)
