@@ -17,10 +17,9 @@ const team = [
 ]
 
 const timeline = [
-  { year: '2023', text: 'Company founded in a garage' },
-  { year: '2024', text: 'Launched Beta to 500 creators' },
-  { year: '2025', text: 'Raised Seed round, hit 10k users' },
-  { year: '2026', text: 'Expanding to Enterprise API' },
+  { year: 'May (Wk 1)', text: 'First line of code written' },
+  { year: 'May (Wk 3)', text: 'Core AI extraction engine built' },
+  { year: 'June (Wk 2)', text: 'Launched Private Beta (Current)' },
 ]
 
 export function About() {
@@ -59,21 +58,11 @@ export function About() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-center gap-8 pt-10 border-t border-[#FFCDD2]"
+            className="pt-10 border-t border-[#FFCDD2]"
           >
-            {[
-              { val: '2023', label: 'Founded' },
-              { val: '12', label: 'Team Size' },
-              { val: '$2.5M', label: 'Funding' }
-            ].map((stat, i) => (
-              <div key={stat.label} className="flex items-center gap-8">
-                <div>
-                  <p className="text-4xl font-bebas text-[#EF5350] leading-none mb-1">{stat.val}</p>
-                  <p className="text-sm font-semibold text-[#616161] uppercase tracking-wider">{stat.label}</p>
-                </div>
-                {i < 2 && <div className="hidden sm:block w-px h-12 bg-[#FFCDD2]" />}
-              </div>
-            ))}
+            <p className="text-xl text-[#1A1A1A] max-w-2xl font-medium leading-relaxed italic border-l-4 border-[#EF5350] pl-6">
+              "We built ShortForge because manually clipping content was taking hours every week. We wanted a tool that didn't just add captions, but actually found the best moments and prepared them for publishing instantly."
+            </p>
           </motion.div>
         </div>
       </section>
@@ -111,8 +100,12 @@ export function About() {
       </section>
 
       {/* Team */}
-      <section className="py-24 px-4 bg-[#FFEBEE]">
-        <div className="max-w-6xl mx-auto">
+      <section className="py-24 px-4 bg-[#FFEBEE] relative">
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
+          <span className="px-6 py-3 bg-[#1A1A1A] text-white font-bebas text-2xl rounded shadow-2xl border border-[#333]">TEAM EXPANDING POST-BETA</span>
+        </div>
+        
+        <div className="max-w-6xl mx-auto blur-md opacity-40 pointer-events-none select-none">
           <motion.div {...fadeUp} className="text-center mb-16">
             <h2 className="text-4xl font-bebas text-[#1A1A1A] mb-4">Meet the team</h2>
           </motion.div>
@@ -165,12 +158,15 @@ export function About() {
       </section>
 
       {/* Small CTA */}
-      <section className="py-20 px-4 bg-[#FFEBEE] text-center">
-        <div className="max-w-2xl mx-auto">
+      <section className="py-20 px-4 bg-[#FFEBEE] text-center relative">
+        <div className="absolute inset-0 z-50 flex items-center justify-center">
+          <span className="px-6 py-3 bg-[#1A1A1A] text-white font-bebas text-2xl rounded shadow-2xl border border-[#333]">HIRING OPENING SOON</span>
+        </div>
+        <div className="max-w-2xl mx-auto blur-md opacity-40 pointer-events-none select-none">
           <h2 className="text-3xl font-bebas text-[#1A1A1A] mb-6">Want to join us?</h2>
-          <Link to="/contact" className="inline-flex items-center gap-2 px-8 py-3 bg-[#1A1A1A] text-white font-semibold hover:bg-[#333] transition-colors">
+          <div className="inline-flex items-center gap-2 px-8 py-3 bg-[#1A1A1A] text-white font-semibold hover:bg-[#333] transition-colors">
             View Open Positions <ArrowRight size={16} />
-          </Link>
+          </div>
         </div>
       </section>
     </div>

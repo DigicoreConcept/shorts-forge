@@ -12,6 +12,17 @@ const fadeUp = {
 
 const plans = [
   {
+    name: 'Free',
+    price: 0,
+    desc: 'Try it out before you commit.',
+    features: [
+      '3 video uploads',
+      '10 AI-generated clips',
+      'Standard AI captions',
+      'Watermarked exports',
+    ],
+  },
+  {
     name: 'Starter',
     price: 19,
     desc: 'Perfect for independent creators getting started.',
@@ -51,17 +62,18 @@ const plans = [
 ]
 
 const comparisonFeatures = [
-  { name: 'Video Uploads', starter: '10 / mo', creator: '50 / mo', agency: 'Unlimited' },
-  { name: 'Generated Clips', starter: '100 / mo', creator: '500 / mo', agency: 'Unlimited' },
-  { name: 'Max Video Length', starter: '60 mins', creator: '120 mins', agency: 'Unlimited' },
-  { name: 'AI Captions', starter: true, creator: true, agency: true },
-  { name: 'Custom Caption Styles', starter: false, creator: true, agency: true },
-  { name: 'Metadata Generation', starter: true, creator: true, agency: true },
-  { name: 'Direct Publishing', starter: false, creator: true, agency: true },
-  { name: 'Multi-Channel Support', starter: false, creator: false, agency: true },
-  { name: 'Team Seats', starter: false, creator: false, agency: true },
-  { name: 'Processing Priority', starter: 'Standard', creator: 'High', agency: 'Highest' },
-  { name: 'Support', starter: 'Email', creator: 'Priority', agency: 'Dedicated 24/7' },
+  { name: 'Video Uploads', free: '3 total', starter: '10 / mo', creator: '50 / mo', agency: 'Unlimited' },
+  { name: 'Generated Clips', free: '10 total', starter: '100 / mo', creator: '500 / mo', agency: 'Unlimited' },
+  { name: 'Max Video Length', free: '15 mins', starter: '60 mins', creator: '120 mins', agency: 'Unlimited' },
+  { name: 'Watermark-free', free: false, starter: true, creator: true, agency: true },
+  { name: 'AI Captions', free: true, starter: true, creator: true, agency: true },
+  { name: 'Custom Caption Styles', free: false, starter: false, creator: true, agency: true },
+  { name: 'Metadata Generation', free: false, starter: true, creator: true, agency: true },
+  { name: 'Direct Publishing', free: false, starter: false, creator: true, agency: true },
+  { name: 'Multi-Channel Support', free: false, starter: false, creator: false, agency: true },
+  { name: 'Team Seats', free: false, starter: false, creator: false, agency: true },
+  { name: 'Processing Priority', free: 'Low', starter: 'Standard', creator: 'High', agency: 'Highest' },
+  { name: 'Support', free: 'Community', starter: 'Email', creator: 'Priority', agency: 'Dedicated 24/7' },
 ]
 
 const faqs = [
@@ -119,64 +131,80 @@ export function Pricing() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-16">
-            {plans.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className={`relative flex flex-col bg-[#FFFFFF] ${
-                  plan.popular
-                    ? 'border-[1.5px] border-[#EF5350] md:-my-4 md:py-12 py-10 px-8 z-10'
-                    : 'border border-[#FFCDD2] py-10 px-8 z-0'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#EF5350] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
-                    Most Popular
-                  </div>
-                )}
-                <h3 className="font-bold text-2xl text-[#1A1A1A] mb-2 text-center">{plan.name}</h3>
-                <p className="text-sm text-[#616161] text-center mb-6">{plan.desc}</p>
-                
-                <AnimatePresence mode="wait">
-                  <motion.div 
-                    key={billing}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex justify-center items-end gap-1 mb-10"
-                  >
-                    <span className="text-6xl font-bebas text-[#1A1A1A] leading-none">
-                      ${billing === 'monthly' ? plan.price : Math.floor(plan.price * 0.8)}
-                    </span>
-                    <span className="text-[#616161] text-sm mb-2">/mo</span>
-                  </motion.div>
-                </AnimatePresence>
+          <div className="relative">
+            {/* Beta Overlay */}
+            <div className="absolute inset-0 z-50 flex items-center justify-center">
+              <div className="bg-[#1A1A1A] p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4 border border-[#333333]">
+                <div className="w-12 h-12 rounded-full bg-[#EF5350]/20 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">🚀</span>
+                </div>
+                <h3 className="font-bebas text-3xl text-white mb-2">Private Beta Active</h3>
+                <p className="text-[#9E9E9E] text-sm mb-6">We are currently in a private beta phase for our first 10 users. During this period, ShortForge is 100% free to use.</p>
+                <Link to="/register" className="inline-block px-8 py-3 bg-[#EF5350] text-white font-semibold rounded hover:bg-[#C62828] transition-colors">
+                  Join Free Beta
+                </Link>
+              </div>
+            </div>
 
-                <ul className="space-y-4 mb-10 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-sm text-[#616161]">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#EF5350] mt-1.5 flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/register"
-                  className={`block text-center py-4 font-semibold transition-all ${
+            {/* Blurred Content */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center mb-16 blur-md pointer-events-none select-none opacity-40">
+              {plans.map((plan, i) => (
+                <motion.div
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className={`relative flex flex-col bg-[#FFFFFF] ${
                     plan.popular
-                      ? 'bg-[#EF5350] text-white hover:bg-[#C62828] shadow-md'
-                      : 'border border-[#FFCDD2] text-[#616161] hover:border-[#EF9090] hover:text-[#1A1A1A] bg-transparent'
+                      ? 'border-[1.5px] border-[#EF5350] md:-my-4 md:py-12 py-10 px-8 z-10'
+                      : 'border border-[#FFCDD2] py-10 px-8 z-0'
                   }`}
                 >
-                  Get Started
-                </Link>
-              </motion.div>
-            ))}
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#EF5350] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                      Most Popular
+                    </div>
+                  )}
+                  <h3 className="font-bold text-2xl text-[#1A1A1A] mb-2 text-center">{plan.name}</h3>
+                  <p className="text-sm text-[#616161] text-center mb-6">{plan.desc}</p>
+                  
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={billing}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex justify-center items-end gap-1 mb-10"
+                    >
+                      <span className="text-6xl font-bebas text-[#1A1A1A] leading-none">
+                        ${billing === 'monthly' ? plan.price : Math.floor(plan.price * 0.8)}
+                      </span>
+                      <span className="text-[#616161] text-sm mb-2">/mo</span>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  <ul className="space-y-4 mb-10 flex-1">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-3 text-sm text-[#616161]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#EF5350] mt-1.5 flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    className={`block text-center py-4 font-semibold transition-all ${
+                      plan.popular
+                        ? 'bg-[#EF5350] text-white shadow-md'
+                        : 'border border-[#FFCDD2] text-[#616161] bg-transparent'
+                    }`}
+                  >
+                    Get Started
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -188,14 +216,19 @@ export function Pricing() {
             <h2 className="text-4xl font-bebas text-[#1A1A1A]">Compare Features</h2>
           </motion.div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[800px]">
+          <div className="overflow-x-auto relative">
+            <div className="absolute inset-0 z-50 flex items-center justify-center">
+              <span className="px-6 py-3 bg-[#1A1A1A] text-white font-bebas text-2xl rounded shadow-2xl border border-[#333]">ALL FEATURES UNLOCKED FOR BETA USERS</span>
+            </div>
+            
+            <table className="w-full text-left border-collapse min-w-[1000px] blur-md pointer-events-none select-none opacity-40">
               <thead>
                 <tr>
-                  <th className="py-6 px-6 font-semibold text-[#1A1A1A] w-1/4"></th>
-                  <th className="py-6 px-6 font-bold text-[#1A1A1A] text-lg w-1/4 text-center">Starter</th>
-                  <th className="py-6 px-6 font-bold text-[#EF5350] text-lg w-1/4 text-center border-b-2 border-[#EF5350]">Creator</th>
-                  <th className="py-6 px-6 font-bold text-[#1A1A1A] text-lg w-1/4 text-center">Agency</th>
+                  <th className="py-6 px-6 font-semibold text-[#1A1A1A] w-[20%]"></th>
+                  <th className="py-6 px-6 font-bold text-[#1A1A1A] text-lg w-[20%] text-center">Free</th>
+                  <th className="py-6 px-6 font-bold text-[#1A1A1A] text-lg w-[20%] text-center">Starter</th>
+                  <th className="py-6 px-6 font-bold text-[#EF5350] text-lg w-[20%] text-center border-b-2 border-[#EF5350]">Creator</th>
+                  <th className="py-6 px-6 font-bold text-[#1A1A1A] text-lg w-[20%] text-center">Agency</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,6 +236,13 @@ export function Pricing() {
                   <tr key={f.name} className={`${i % 2 === 0 ? 'bg-[#FFFFFF]' : 'bg-[#FFF5F5]'} border-b border-[#FFCDD2]`}>
                     <td className="py-5 px-6 font-medium text-[#1A1A1A]">{f.name}</td>
                     
+                    {/* Free */}
+                    <td className="py-5 px-6 text-center text-[#616161]">
+                      {typeof f.free === 'boolean' 
+                        ? (f.free ? <Check size={20} className="mx-auto text-[#EF5350]" /> : <Minus size={20} className="mx-auto text-[#FFCDD2]" />)
+                        : f.free}
+                    </td>
+
                     {/* Starter */}
                     <td className="py-5 px-6 text-center text-[#616161]">
                       {typeof f.starter === 'boolean' 

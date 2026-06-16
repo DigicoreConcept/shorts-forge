@@ -55,7 +55,7 @@ export function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
-                className="text-xs font-bold italic tracking-widest text-[#616161] hover:text-[#EF5350] transition-colors"
+                className={`text-xs font-bold italic tracking-widest ${showBg ? "text-[#616161]" : "text-white"} hover:text-[#EF5350] transition-colors`}
               >
                 {link.label}
               </Link>
@@ -77,13 +77,13 @@ export function Navbar() {
               <>
                 <Link
                   to="/login"
-                  className="hidden sm:block text-[#1A1A1A] text-xs font-black italic tracking-widest hover:text-[#EF5350] transition-colors"
+                  className={`hidden sm:block ${showBg ? "hover:text-[#EF5350]" : "hover:text-[#EF5350] hover:bg-[#1A1A1A]"} px-5 py-2.5 text-[#1A1A1A] text-xs font-black italic tracking-widest  transition-colors`}
                 >
                   LOG IN
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-[#EF5350] text-white px-5 py-2.5 rounded-xl text-xs font-black italic tracking-widest hover:bg-[#C62828] transition-colors shadow-sm"
+                  className="bg-[#EF5350] text-white text-xs px-5 py-2.5 font-black italic tracking-widest hover:bg-[#C62828] transition-colors shadow-sm"
                 >
                   START FREE
                 </Link>

@@ -2,12 +2,14 @@ import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Upload, Link as LinkIcon, X, Plus, Trash2, Clock, Globe } from 'lucide-react'
+import { Upload, Link as LinkIcon, X, Plus, Trash2, Clock, Globe, Smartphone, Monitor, Square, LayoutTemplate, Maximize, Image as ImageIcon } from 'lucide-react'
 import { uploadVideoChunks } from '@/lib/upload'
 import { api } from '@/lib/api'
 
 type InputMode = 'file' | 'url'
 type ClipDuration = 30 | 60 | 90 | 'custom'
+type ClipDimension = '16:9' | '9:16' | '1:1'
+type ClipEffect = 'glassmorphism' | 'fit' | 'blurred_background'
 
 interface TimeRange {
   id: string
@@ -32,6 +34,9 @@ export function UploadPage() {
   const [title, setTitle] = useState('')
   const [language, setLanguage] = useState('Auto-detect')
   const [duration, setDuration] = useState<ClipDuration>(60)
+  const [maxClips, setMaxClips] = useState<number | 'auto'>('auto')
+  const [dimension, setDimension] = useState<ClipDimension>('9:16')
+  const [effect, setEffect] = useState<ClipEffect>('glassmorphism')
   const [timeRanges, setTimeRanges] = useState<TimeRange[]>([{ id: '1', start: '00:00', end: '01:00' }])
   const [submitting, setSubmitting] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -82,7 +87,9 @@ export function UploadPage() {
         title,
         language: language === 'Auto-detect' ? 'auto' : language,
         desired_duration: duration.toString(),
-        max_clips: 1,
+        dimension,
+        effect,
+        max_clips: maxClips === 'auto' ? 0 : maxClips,
         ...(video_id ? { video_id } : {}),
         ...(source_url ? { source_url } : {}),
         ...(duration === 'custom' ? {
@@ -309,6 +316,116 @@ export function UploadPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Max Clips */}
+        <div>
+          <label className="block text-xs text-[#616161] mb-2 font-medium">Max Clips to Generate</label>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMaxClips('auto')}
+              className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                maxClips === 'auto'
+                  ? 'bg-[#EF5350] text-white border-[#EF5350] shadow-md shadow-[#EF5350]/20'
+                  : 'bg-[#FFFFFF] text-[#616161] border-[#FFCDD2] hover:border-[#EF9090]'
+              }`}
+            >
+              Auto (Max possible)
+            </button>
+            
+            <div className={`flex items-center border rounded-xl overflow-hidden transition-colors ${
+              typeof maxClips === 'number' ? 'border-[#EF5350] shadow-md shadow-[#EF5350]/20' : 'border-[#FFCDD2]'
+            }`}>
+              <button 
+                type="button"
+                onClick={() => setMaxClips(prev => (typeof prev === 'number' && prev > 1) ? prev - 1 : 1)}
+                className={`px-3 py-2.5 bg-[#FFF5F5] hover:bg-[#FFEBEE] transition-colors ${typeof maxClips === 'number' ? 'text-[#EF5350]' : 'text-[#9E9E9E]'}`}
+              >
+                -
+              </button>
+              <input 
+                type="text" 
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={maxClips === 'auto' ? '' : maxClips}
+                onChange={(e) => {
+                  const valStr = e.target.value.replace(/[^0-9]/g, '');
+                  if (!valStr) {
+                    setMaxClips('auto');
+                    return;
+                  }
+                  const val = parseInt(valStr, 10);
+                  if (isNaN(val) || val < 1) setMaxClips('auto');
+                  else setMaxClips(val);
+                }}
+                placeholder="Custom..."
+                className="w-20 text-center outline-none bg-[#FFFFFF] text-sm font-medium text-[#1A1A1A] py-2.5"
+              />
+              <button 
+                type="button"
+                onClick={() => setMaxClips(prev => typeof prev === 'number' ? prev + 1 : 5)}
+                className={`px-3 py-2.5 bg-[#FFF5F5] hover:bg-[#FFEBEE] transition-colors ${typeof maxClips === 'number' ? 'text-[#EF5350]' : 'text-[#9E9E9E]'}`}
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-[#9E9E9E] mt-2">If Auto is selected, ShortForge will extract as many clips as the video permits.</p>
+        </div>
+
+        {/* Dimension */}
+        <div>
+          <label className="block text-xs text-[#616161] mb-2 font-medium">Clip Dimension</label>
+          <div className="flex gap-2">
+            {[
+              { id: '16:9', icon: Monitor, label: '16:9', desc: 'Landscape' },
+              { id: '9:16', icon: Smartphone, label: '9:16', desc: 'Portrait' },
+              { id: '1:1', icon: Square, label: '1:1', desc: 'Square' }
+            ].map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => setDimension(d.id as ClipDimension)}
+                className={`flex-1 flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all ${
+                  dimension === d.id
+                    ? 'bg-[#EF5350] text-white border-[#EF5350] shadow-md shadow-[#EF5350]/20'
+                    : 'bg-[#FFFFFF] text-[#616161] border-[#FFCDD2] hover:border-[#EF9090]'
+                }`}
+              >
+                <d.icon size={20} />
+                <span className="text-xs font-medium">{d.label}</span>
+                <span className={`text-[10px] ${dimension === d.id ? 'text-[#FFCDD2]' : 'text-[#9E9E9E]'}`}>{d.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Effect */}
+        <div>
+          <label className="block text-xs text-[#616161] mb-2 font-medium">Background Effect</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {[
+              { id: 'glassmorphism', icon: LayoutTemplate, label: 'Glassmorphism', desc: 'Frosted blur background' },
+              { id: 'fit', icon: Maximize, label: 'Fit to Screen', desc: 'Stretched or zoomed to fit' },
+              { id: 'blurred_background', icon: ImageIcon, label: 'Blurred Thumbnail', desc: 'Original size with blurred poster' }
+            ].map((e) => (
+              <button
+                key={e.id}
+                type="button"
+                onClick={() => setEffect(e.id as ClipEffect)}
+                className={`flex flex-col items-start p-3 rounded-xl border transition-all text-left ${
+                  effect === e.id
+                    ? 'bg-[#EF5350] text-white border-[#EF5350] shadow-md shadow-[#EF5350]/20'
+                    : 'bg-[#FFFFFF] text-[#616161] border-[#FFCDD2] hover:border-[#EF9090]'
+                }`}
+              >
+                <e.icon size={16} className={`mb-2 ${effect === e.id ? 'text-white' : 'text-[#EF5350]'}`} />
+                <span className="text-sm font-medium mb-0.5">{e.label}</span>
+                <span className={`text-[10px] leading-tight ${effect === e.id ? 'text-[#FFCDD2]' : 'text-[#9E9E9E]'}`}>{e.desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <button
           type="submit"

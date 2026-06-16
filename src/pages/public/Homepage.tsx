@@ -60,25 +60,25 @@ const howItWorksSteps = [
     id: 1, 
     title: 'Upload Your Video', 
     desc: 'Drag and drop your raw podcast, webinar, or tutorial file, or paste a YouTube URL.',
-    screenshotInstruction: 'Screenshot Needed: Dashboard Upload Page (/dashboard/upload). Focus on the drag-and-drop zone and YouTube link input.'
+    image: '/images/step1_real.png'
   },
   { 
     id: 2, 
     title: 'Processing', 
     desc: 'The platform processes the audio and video to generate high-quality clips based on your chosen duration and timestamps.',
-    screenshotInstruction: 'Screenshot Needed: Dashboard Processing Page (/dashboard/processing/1). Capture the active progress bar and step indicators.'
+    image: '/images/step2_real.png'
   },
   { 
     id: 3, 
     title: 'Automatic Captions', 
     desc: 'Clips are generated with dynamic captions and auto-reformatting for vertical screens.',
-    screenshotInstruction: 'Screenshot Needed: Dashboard Clip Detail Page (/dashboard/clips/1). Capture the video player with captions and the right-side editor panel.'
+    image: '/images/step3_real.png'
   },
   { 
     id: 4, 
     title: 'Review & Publish', 
     desc: 'Preview your shorts, tweak captions if needed, and publish directly to TikTok, Reels, and Shorts in one click.',
-    screenshotInstruction: 'Screenshot Needed: Dashboard Clips Grid (/dashboard/clips). Capture the grid of completed clips with the social media "Publish" buttons visible.'
+    image: '/images/step3_real.png'
   }
 ]
 
@@ -219,18 +219,32 @@ export function Homepage() {
               transition={{ duration: 0.5 }}
               className="text-6xl sm:text-7xl xl:text-[5.5rem] font-bebas uppercase leading-[0.95] tracking-tight mb-8"
             >
-              <span className="text-[#EF5350] block drop-shadow-md">READY-TO</span>
-              <span className="text-[#1A1A1A] block drop-shadow-md">PUBLISH</span>
+              <span className="text-[#EF5350] block drop-shadow-md">ONE PODCAST.</span>
+              <span className="text-[#1A1A1A] block drop-shadow-md">TWENTY-FIVE SHORTS.</span>
             </motion.h1>
             
             <motion.p
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-gray-300 text-sm max-w-sm mb-16 leading-relaxed"
+              className="text-gray-300 text-sm max-w-sm mb-10 leading-relaxed"
             >
-              Upload a podcast, webinar, or YouTube video and generate shorts, captions, titles, and descriptions in minutes. Turn long videos into viral clips effortlessly.
+              Stop manually editing clips. Let ShortForge find, format, caption, and prepare content for publishing.
             </motion.p>
+            
+            {/* Transformation Visual */}
+            <motion.div 
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="flex items-center gap-3 text-xs font-bold tracking-widest uppercase mb-12 bg-black/20 p-4 rounded-xl border border-white/5"
+            >
+              <span className="text-[#9E9E9E]">58 Min Podcast</span>
+              <ArrowRight size={14} className="text-[#EF5350]" />
+              <span className="text-[#EF5350]">25 Shorts</span>
+              <ArrowRight size={14} className="text-[#EF5350]" />
+              <span className="text-white">Ready To Publish</span>
+            </motion.div>
             
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -356,6 +370,38 @@ export function Homepage() {
         </div>
       </section>
 
+      {/* Demo Section */}
+      <section className="py-24 px-4 bg-[#111216] border-y border-white/10 text-center">
+        <div className="max-w-4xl mx-auto">
+          <motion.div {...fadeUp} className="mb-10">
+            <h2 className="text-4xl sm:text-5xl font-bebas text-white leading-none mb-4">
+              Watch a 58-minute podcast become 25 shorts
+            </h2>
+            <p className="text-gray-400">See ShortForge in action.</p>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, y: 24, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="w-full aspect-video bg-gray-900 border border-white/10 rounded-2xl shadow-2xl relative flex items-center justify-center overflow-hidden group cursor-pointer"
+          >
+            {/* Play button overlay */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 group-hover:bg-black/20 transition-colors">
+              <div className="w-20 h-20 rounded-full bg-[#EF5350] flex items-center justify-center text-white shadow-[0_0_40px_rgba(239,83,80,0.4)] group-hover:scale-110 transition-transform">
+                <Play size={32} fill="currentColor" className="ml-2" />
+              </div>
+            </div>
+            
+            {/* Fake video timeline */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20">
+              <div className="h-full w-1/3 bg-[#EF5350]" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* How it works */}
       <section className="py-24 px-4 bg-[#FFF5F5] border-y border-[#FFCDD2] relative">
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-24">
@@ -420,14 +466,26 @@ export function Homepage() {
                   transition={{ duration: 0.4 }}
                   className="w-full h-full bg-[#FFF5F5] rounded-xl border border-[#FFCDD2]/50 flex items-center justify-center flex-col gap-6 relative z-10"
                 >
-                  {/* Placeholder for dynamic step visual */}
-                  <div className="w-full h-full p-6 flex flex-col items-center justify-center text-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-[#EF5350]/10 flex items-center justify-center text-[#EF5350] shrink-0">
-                      <Zap size={32} />
-                    </div>
-                    <p className="font-bold text-[#1A1A1A] text-lg">Image Needed</p>
-                    <div className="p-4 bg-white rounded-lg border border-[#FFCDD2] shadow-sm text-sm text-[#616161]">
-                      {howItWorksSteps[activeStep].screenshotInstruction}
+                  {/* Browser Mockup Wrapper */}
+                  <div className="w-full h-full p-4 md:p-6 lg:p-8 flex items-center justify-center bg-gradient-to-br from-[#FFF5F5] to-[#FFEBEE]">
+                    
+                    <div className="w-full h-full relative overflow-hidden rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-[#FFCDD2]/50 bg-white flex flex-col transition-transform duration-500 hover:scale-[1.02]">
+                      
+                      {/* Browser Top Bar */}
+                      <div className="h-8 bg-[#F8F9FA] border-b border-[#FFCDD2]/50 flex items-center px-4 gap-2 w-full flex-shrink-0">
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] shadow-sm" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] shadow-sm" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#27C93F] shadow-sm" />
+                      </div>
+                      
+                      {/* Screenshot Content */}
+                      <div className="relative flex-1 w-full overflow-hidden bg-[#FAFAFA]">
+                        <img 
+                          src={howItWorksSteps[activeStep].image} 
+                          alt={howItWorksSteps[activeStep].title}
+                          className="absolute inset-0 w-full h-full object-cover object-top"
+                        />
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -596,63 +654,78 @@ export function Homepage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {pricingPlans.map((plan, i) => (
-              <motion.div
-                key={plan.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.1 }}
-                className={`relative flex flex-col bg-[#FFFFFF] ${
-                  plan.popular
-                    ? 'border-[1.5px] border-[#EF5350] md:-my-4 md:py-10 py-8 px-6 z-10'
-                    : 'border border-[#FFCDD2] py-8 px-6 z-0'
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#EF5350] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
-                    Most Popular
-                  </div>
-                )}
-                <h3 className="font-bold text-xl text-[#1A1A1A] mb-2 text-center">{plan.name}</h3>
-                
-                <AnimatePresence mode="wait">
-                  <motion.div 
-                    key={billing}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex justify-center items-end gap-1 mb-8"
-                  >
-                    <span className="text-5xl font-bebas text-[#1A1A1A] leading-none">
-                      ${billing === 'monthly' ? plan.price : Math.floor(plan.price * 0.8)}
-                    </span>
-                    <span className="text-[#616161] text-sm mb-1">/mo</span>
-                  </motion.div>
-                </AnimatePresence>
+          <div className="relative">
+            {/* Beta Overlay */}
+            <div className="absolute inset-0 z-50 flex items-center justify-center">
+              <div className="bg-[#1A1A1A] p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4 border border-[#333333]">
+                <div className="w-12 h-12 rounded-full bg-[#EF5350]/20 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-xl">🚀</span>
+                </div>
+                <h3 className="font-bebas text-3xl text-white mb-2">Private Beta Active</h3>
+                <p className="text-[#9E9E9E] text-sm mb-6">ShortForge is currently in a private beta phase. Join now to get 100% free access before we launch.</p>
+                <Link to="/register" className="inline-block px-8 py-3 bg-[#EF5350] text-white font-semibold rounded hover:bg-[#C62828] transition-colors">
+                  Join Free Beta
+                </Link>
+              </div>
+            </div>
 
-                <ul className="space-y-4 mb-8 flex-1">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-3 text-sm text-[#616161]">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#EF5350] mt-1.5 flex-shrink-0" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/register"
-                  className={`block text-center py-3 font-semibold transition-all ${
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center blur-md pointer-events-none select-none opacity-40">
+              {pricingPlans.map((plan, i) => (
+                <motion.div
+                  key={plan.name}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                  className={`relative flex flex-col bg-[#FFFFFF] ${
                     plan.popular
-                      ? 'bg-[#EF5350] text-white hover:bg-[#C62828] shadow-md'
-                      : 'border border-[#FFCDD2] text-[#616161] hover:border-[#EF9090] hover:text-[#1A1A1A] bg-transparent'
+                      ? 'border-[1.5px] border-[#EF5350] md:-my-4 md:py-10 py-8 px-6 z-10'
+                      : 'border border-[#FFCDD2] py-8 px-6 z-0'
                   }`}
                 >
-                  Get Started
-                </Link>
-              </motion.div>
-            ))}
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[#EF5350] text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+                      Most Popular
+                    </div>
+                  )}
+                  <h3 className="font-bold text-xl text-[#1A1A1A] mb-2 text-center">{plan.name}</h3>
+                  
+                  <AnimatePresence mode="wait">
+                    <motion.div 
+                      key={billing}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex justify-center items-end gap-1 mb-8"
+                    >
+                      <span className="text-5xl font-bebas text-[#1A1A1A] leading-none">
+                        ${billing === 'monthly' ? plan.price : Math.floor(plan.price * 0.8)}
+                      </span>
+                      <span className="text-[#616161] text-sm mb-1">/mo</span>
+                    </motion.div>
+                  </AnimatePresence>
+
+                  <ul className="space-y-4 mb-8 flex-1">
+                    {plan.features.map((f) => (
+                      <li key={f} className="flex items-start gap-3 text-sm text-[#616161]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#EF5350] mt-1.5 flex-shrink-0" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <div
+                    className={`block text-center py-3 font-semibold transition-all ${
+                      plan.popular
+                        ? 'bg-[#EF5350] text-white shadow-md'
+                        : 'border border-[#FFCDD2] text-[#616161] bg-transparent'
+                    }`}
+                  >
+                    Get Started
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

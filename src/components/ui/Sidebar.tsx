@@ -12,7 +12,6 @@ const navItems = [
   { icon: FolderOpen, label: 'Projects', to: '/dashboard/projects' },
   { icon: Film, label: 'Clips', to: '/dashboard/clips' },
   { icon: Upload, label: 'Uploads', to: '/dashboard/upload' },
-  { icon: Radio, label: 'Channels', to: '/dashboard/channels' },
 ]
 
 const bottomItems = [

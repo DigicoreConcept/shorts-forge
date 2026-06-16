@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Type, FileText, Download, ArrowRight } from 'lucide-react'
+import { Type, FileText, Download, ArrowRight, UploadCloud, Mic, Scissors, Send } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const fadeUp = {
@@ -45,6 +45,48 @@ export function Features() {
           <p className="text-sm font-bold text-[#EF5350] tracking-widest uppercase mb-4">Features</p>
           <h1 className="text-5xl sm:text-7xl font-bebas text-[#1A1A1A] mb-6 leading-none">Built for <span className="text-[#EF5350]">viral growth</span></h1>
           <p className="text-xl text-[#616161]">Everything you need to scale your content, housed in one seamless workflow.</p>
+        </div>
+      </section>
+
+      {/* Processing Pipeline Showcase */}
+      <section className="py-24 px-4 bg-[#111216] text-center border-b border-white/10">
+        <div className="max-w-6xl mx-auto flex flex-col items-center">
+          <motion.div {...fadeUp} className="mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bebas text-white mb-4">The Engine Behind The Magic</h2>
+            <p className="text-gray-400 max-w-2xl mx-auto">
+              We've built a robust, scalable backend pipeline that handles the heavy lifting. You just hit upload.
+            </p>
+          </motion.div>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2">
+            {[
+              { icon: UploadCloud, label: 'Upload' },
+              { icon: Scissors, label: 'Generate Clips' },
+              { icon: Mic, label: 'Transcribe' },
+              { icon: Type, label: 'Generate Titles' },
+              { icon: FileText, label: 'Generate Descriptions' },
+              { icon: Send, label: 'Publish' }
+            ].map((step, i, arr) => (
+              <motion.div 
+                key={step.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="flex flex-col md:flex-row items-center"
+              >
+                <div className="flex flex-col items-center p-6 bg-gray-900 border border-white/10 rounded-2xl w-40 h-32 justify-center group hover:border-[#EF5350]/50 transition-colors">
+                  <step.icon size={28} className="text-[#EF5350] mb-3 group-hover:scale-110 transition-transform" />
+                  <span className="text-sm font-semibold text-white text-center leading-tight">{step.label}</span>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className="my-4 md:my-0 md:mx-4 text-[#EF5350] md:rotate-0 rotate-90">
+                    <ArrowRight size={20} />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -111,8 +153,8 @@ export function Features() {
       {/* Footer CTA Feed */}
       <section className="py-32 px-4 bg-[#FFFFFF] text-center">
         <h2 className="text-5xl font-bebas text-[#1A1A1A] mb-8">Ready to supercharge your content?</h2>
-        <Link to="/pricing" className="inline-flex items-center gap-2 px-10 py-4 bg-[#EF5350] text-white font-semibold hover:bg-[#C62828] transition-colors shadow-lg shadow-[#EF5350]/20">
-          View Pricing <ArrowRight size={18} />
+        <Link to="/register" className="inline-flex items-center gap-2 px-10 py-4 bg-[#EF5350] text-white font-semibold hover:bg-[#C62828] transition-colors shadow-lg shadow-[#EF5350]/20">
+          Register for Beta (Testing) <ArrowRight size={18} />
         </Link>
       </section>
     </div>
