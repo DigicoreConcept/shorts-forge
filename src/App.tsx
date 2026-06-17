@@ -26,6 +26,7 @@ import { ProcessingPage } from '@/pages/dashboard/ProcessingPage'
 import { ClipsPage } from '@/pages/dashboard/ClipsPage'
 import { ClipDetail } from '@/pages/dashboard/ClipDetail'
 import { ProjectsPage } from '@/pages/dashboard/ProjectsPage'
+import { ProjectDetail } from '@/pages/dashboard/ProjectDetail'
 import { ChannelsPage } from '@/pages/dashboard/ChannelsPage'
 import { BillingPage } from '@/pages/dashboard/BillingPage'
 import { SettingsPage } from '@/pages/dashboard/SettingsPage'
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="clips" element={<ClipsPage />} />
             <Route path="clips/:id" element={<ClipDetail />} />
             <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/:id" element={<ProjectDetail />} />
             <Route path="channels" element={<ChannelsPage />} />
             <Route path="billing" element={<BillingPage />} />
             <Route path="settings" element={<SettingsPage />} />

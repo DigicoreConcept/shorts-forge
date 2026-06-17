@@ -217,19 +217,19 @@ export function Homepage() {
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              className="text-6xl sm:text-7xl xl:text-[5.5rem] font-bebas uppercase leading-[0.95] tracking-tight mb-8"
+              className="text-6xl sm:text-7xl xl:text-[5rem] font-bebas uppercase leading-[0.95] tracking-tight mb-8"
             >
-              <span className="text-[#EF5350] block drop-shadow-md">ONE PODCAST.</span>
-              <span className="text-[#1A1A1A] block drop-shadow-md">TWENTY-FIVE SHORTS.</span>
+              <span className="text-[#EF5350] block drop-shadow-md">TURN ONE LONG VIDEO</span>
+              <span className="text-[#1A1A1A] block drop-shadow-md">INTO DOZENS OF CLIPS.</span>
             </motion.h1>
             
             <motion.p
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-gray-300 text-sm max-w-sm mb-10 leading-relaxed"
+              className="text-gray-300 text-base max-w-sm mb-10 leading-relaxed"
             >
-              Stop manually editing clips. Let ShortForge find, format, caption, and prepare content for publishing.
+              Turn one long video into dozens of social-ready clips in minutes.
             </motion.p>
             
             {/* Transformation Visual */}

@@ -7,12 +7,31 @@ import { Clip } from '@/types'
 
 // Dynamic thumbnail generator
 export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackColor: string }) {
+  const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [thumb, setThumb] = useState<string | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  // Lazy load intersection observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '100px' }
+    )
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
+    }
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
-    if (!src) return
+    if (!isVisible || !src) return
     const video = videoRef.current
     if (!video) return
     
@@ -25,11 +44,16 @@ export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackCo
     const handleSeeked = () => {
       const canvas = canvasRef.current
       if (canvas && video) {
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        const ctx = canvas.getContext('2d')
-        ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
-        setThumb(canvas.toDataURL('image/jpeg'))
+        try {
+          canvas.width = video.videoWidth
+          canvas.height = video.videoHeight
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+          setThumb(canvas.toDataURL('image/jpeg'))
+        } catch (e) {
+          console.warn('CORS error extracting thumbnail, falling back to color block', e)
+          // Silently fail and keep the fallback color if the canvas is tainted
+        }
       }
     }
     
@@ -39,18 +63,20 @@ export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackCo
       video.removeEventListener('loadeddata', handleLoadedData)
       video.removeEventListener('seeked', handleSeeked)
     }
-  }, [src])
-
-  if (thumb) {
-    return <img src={thumb} alt="Thumbnail" className="w-full h-full object-cover" />
-  }
+  }, [isVisible, src])
 
   return (
-    <>
-      <video ref={videoRef} src={src} preload="metadata" className="hidden" muted playsInline />
-      <canvas ref={canvasRef} className="hidden" />
-      <div className="w-full h-full" style={{ background: fallbackColor }} />
-    </>
+    <div ref={containerRef} className="w-full h-full relative">
+      {thumb ? (
+        <img src={thumb} alt="Thumbnail" className="w-full h-full object-cover" />
+      ) : (
+        <>
+          {isVisible && <video ref={videoRef} src={src} crossOrigin="anonymous" preload="metadata" className="hidden" muted playsInline />}
+          <canvas ref={canvasRef} className="hidden" />
+          <div className="w-full h-full" style={{ background: fallbackColor }} />
+        </>
+      )}
+    </div>
   )
 }
 
@@ -82,10 +108,11 @@ export function ClipsPage() {
 
   const filtered = clips.filter((c) => (c.ai_title || '').toLowerCase().includes(search.toLowerCase()))
 
-  const getFallbackColor = (id: string) => {
+  const getFallbackColor = (id: string | number) => {
+    const strId = String(id || '')
     const colors = ['#EF5350', '#C62828', '#22C55E', '#F59E0B']
     let sum = 0
-    for(let i=0; i<id.length; i++) sum += id.charCodeAt(i)
+    for(let i=0; i<strId.length; i++) sum += strId.charCodeAt(i)
     return `${colors[sum % colors.length]}15`
   }
 
@@ -139,7 +166,7 @@ export function ClipsPage() {
               className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl overflow-hidden hover:border-[#EF9090] transition-all group"
             >
               {/* Thumbnail */}
-              <div className="relative aspect-[9/16] max-h-48 overflow-hidden bg-black/5">
+              <div className="relative aspect-[9/16] max-h-42 overflow-hidden bg-black/5">
                 {clip.thumbnail_url ? (
                   <img src={clip.thumbnail_url} alt="Thumbnail" className="w-full h-full object-cover" />
                 ) : clip.playback_url ? (

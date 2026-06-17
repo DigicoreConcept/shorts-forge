@@ -56,7 +56,7 @@ export function ProjectsPage() {
           {videos.map((video) => (
             <Link
               key={video.id}
-              to={`/dashboard/clips?video_id=${video.id}`}
+              to={`/dashboard/projects/${video.id}`}
               className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 hover:border-[#EF9090] transition-all group block"
             >
               <div className="flex items-start gap-4 mb-4">

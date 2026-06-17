@@ -52,7 +52,10 @@ export function UploadPage() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: { 'video/*': ['.mp4', '.mov', '.avi', '.mkv', '.webm'] },
+    accept: { 
+      'video/*': ['.mp4', '.mov', '.avi', '.mkv', '.webm'],
+      'audio/*': ['.mp3', '.wav', '.m4a']
+    },
     maxFiles: 1,
   })
 
@@ -178,9 +181,9 @@ export function UploadPage() {
                     <Upload size={24} className="text-[#EF5350]" />
                   </div>
                   <p className="text-[#1A1A1A] font-medium mb-1">
-                    {isDragActive ? 'Drop it here...' : 'Drag & drop your video'}
+                    {isDragActive ? 'Drop it here...' : 'Drag & drop your video or audio'}
                   </p>
-                  <p className="text-xs text-[#9E9E9E]">or click to browse — MP4, MOV, MKV, WebM up to 2GB</p>
+                  <p className="text-xs text-[#9E9E9E]">or click to browse — MP4, MOV, WebM, MP3, WAV up to 2GB</p>
                 </div>
               ) : (
                 <div className="flex items-center gap-4 p-4 bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl">
@@ -222,7 +225,7 @@ export function UploadPage() {
 
         {/* Title */}
         <div>
-          <label className="block text-xs text-[#616161] mb-1.5 font-medium">Video Title</label>
+          <label className="block text-xs text-[#616161] mb-1.5 font-medium">Media Title</label>
           <input
             type="text"
             value={title}
@@ -374,7 +377,7 @@ export function UploadPage() {
         </div>
 
         {/* Dimension */}
-        <div>
+        <div className="hidden">
           <label className="block text-xs text-[#616161] mb-2 font-medium">Clip Dimension</label>
           <div className="flex gap-2">
             {[
@@ -401,7 +404,7 @@ export function UploadPage() {
         </div>
 
         {/* Effect */}
-        <div>
+        <div className="hidden">
           <label className="block text-xs text-[#616161] mb-2 font-medium">Background Effect</label>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {[
