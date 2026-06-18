@@ -1,8 +1,8 @@
-# ShortForge
+# ReelCut
 
 ## Platform Introduction
 
-ShortForge is a SaaS platform that turns long-form videos into ready-to-publish short clips automatically. Users upload a video (or paste a public URL), define clip timeframes, and the platform generates clips, AI captions, titles, descriptions, and hashtags. Built for podcasters, marketers, and content agencies.
+ReelCut is a SaaS platform that turns long-form videos into ready-to-publish short clips automatically. Users upload a video (or paste a public URL), define clip timeframes, and the platform generates clips, AI captions, titles, descriptions, and hashtags. Built for podcasters, marketers, and content agencies.
 
 ---
 
@@ -25,7 +25,7 @@ All backend processing is mocked in the frontend. API calls are stubbed with `us
 
 ```bash
 git clone <repo>
-cd ShortForge
+cd ReelCut
 npm install
 npm run dev
 ```

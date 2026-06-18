@@ -21,6 +21,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
-    { name: 'shortforge-auth' }
+    { name: 'reelcut-auth' }
   )
 )

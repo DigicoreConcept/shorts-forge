@@ -37,7 +37,7 @@ export function Sidebar() {
           <div className="w-8 h-8 rounded bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/20">
             <Zap size={14} className="text-white fill-white" />
           </div>
-          <span className="font-bebas text-xl text-white tracking-widest mt-1">ShortForge</span>
+          <span className="font-bebas text-xl text-white tracking-widest mt-1">ReelCut</span>
         </div>
       </div>
 

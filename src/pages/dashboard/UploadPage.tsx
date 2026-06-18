@@ -373,7 +373,7 @@ export function UploadPage() {
               </button>
             </div>
           </div>
-          <p className="text-xs text-[#9E9E9E] mt-2">If Auto is selected, ShortForge will extract as many clips as the video permits.</p>
+          <p className="text-xs text-[#9E9E9E] mt-2">If Auto is selected, ReelCut will extract as many clips as the video permits.</p>
         </div>
 
         {/* Dimension */}

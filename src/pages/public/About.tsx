@@ -50,7 +50,7 @@ export function About() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="text-xl text-[#616161] max-w-lg leading-relaxed"
             >
-              ShortForge exists because great content shouldn't be locked behind a video editing degree.
+              ReelCut exists because great content shouldn't be locked behind a video editing degree.
             </motion.p>
           </div>
 
@@ -61,7 +61,7 @@ export function About() {
             className="pt-10 border-t border-[#FFCDD2]"
           >
             <p className="text-xl text-[#1A1A1A] max-w-2xl font-medium leading-relaxed italic border-l-4 border-[#EF5350] pl-6">
-              "We built ShortForge because manually clipping content was taking hours every week. We wanted a tool that didn't just add captions, but actually found the best moments and prepared them for publishing instantly."
+              "We built ReelCut because manually clipping content was taking hours every week. We wanted a tool that didn't just add captions, but actually found the best moments and prepared them for publishing instantly."
             </p>
           </motion.div>
         </div>

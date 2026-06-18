@@ -18,9 +18,8 @@ interface Step {
 const STEPS: Step[] = [
   { id: 0, icon: Upload,        label: 'Uploading',           sublabel: 'Transferring your video securely...', duration: 3 },
   { id: 1, icon: Scissors,      label: 'Generating Clips',    sublabel: 'Extracting clips based on duration...', duration: 6 },
-  { id: 2, icon: Mic2,          label: 'Transcribing',        sublabel: 'Processing audio and preparing captions...', duration: 5 },
-  { id: 3, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
-  { id: 4, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
+  { id: 2, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
+  { id: 3, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
 ]
 
 type StepState = 'pending' | 'active' | 'done' | 'error'
@@ -142,9 +141,8 @@ export function ProcessingPage() {
           const stepMap: Record<string, number> = {
             'uploading': 0,
             'generating_clips': 1,
-            'transcribing': 2,
-            'generating_metadata': 3,
-            'completed': 4
+            'generating_metadata': 2,
+            'completed': 3
           }
 
           const activeIndex = data.current_step && stepMap[data.current_step] !== undefined
@@ -244,7 +242,7 @@ export function ProcessingPage() {
             <div className="w-8 h-8 rounded-lg bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
               <Zap size={14} className="text-white fill-white" />
             </div>
-            <span className="font-bold text-[#1A1A1A]">ShortForge</span>
+            <span className="font-bold text-[#1A1A1A]">ReelCut</span>
           </div>
           <AnimatePresence mode="wait">
             {completed ? (

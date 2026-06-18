@@ -21,7 +21,7 @@ export function AuthLayout() {
             <div className="w-10 h-10 rounded-xl bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
               <Zap size={20} className="text-white fill-white" />
             </div>
-            <span className="font-bold text-2xl text-[#1A1A1A] tracking-tight">ShortForge</span>
+            <span className="font-bold text-2xl text-[#1A1A1A] tracking-tight">ReelCut</span>
           </Link>
 
           <h1 className="text-5xl xl:text-7xl font-bebas text-[#1A1A1A] leading-none tracking-tight mb-6 uppercase">
@@ -39,7 +39,7 @@ export function AuthLayout() {
           <div className="w-8 h-8 rounded-xl bg-[#EF5350] flex items-center justify-center shadow-md">
             <Zap size={16} className="text-white fill-white" />
           </div>
-          <span className="font-bold text-xl text-[#1A1A1A]">ShortForge</span>
+          <span className="font-bold text-xl text-[#1A1A1A]">ReelCut</span>
         </Link>
 
         <motion.div

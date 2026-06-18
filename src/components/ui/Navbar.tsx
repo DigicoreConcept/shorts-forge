@@ -38,15 +38,12 @@ export function Navbar() {
         {/* Left Side */}
         <div className="flex-1 flex items-center pl-6 lg:pl-8 gap-8 lg:gap-16">
           {/* LOGO */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group h-16 w-40">
             <img
-              src="/logo.png"
-              alt="ShortForge Logo"
-              className="w-8 h-8 rounded object-cover shadow-sm"
+              src={showBg ? "/reel-logo-black.png" : "/reel-log-white.png"}
+              alt="ReelCut Logo"
+              className="w-full h-full rounded object-contain"
             />
-            <span className="font-black italic text-2xl text-[#1A1A1A] tracking-widest drop-shadow-sm">
-              <span className="text-[#EF5350]">S</span>HORT FORGE
-            </span>
           </Link>
 
           {/* Nav Links */}

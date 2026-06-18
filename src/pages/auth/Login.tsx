@@ -58,7 +58,7 @@ export function Login() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-[#1A1A1A] mb-1">Welcome back</h1>
-      <p className="text-sm text-[#9E9E9E] mb-6">Sign in to your ShortForge account</p>
+      <p className="text-sm text-[#9E9E9E] mb-6">Sign in to your ReelCut account</p>
 
       {error && (
         <div className="mb-4 px-4 py-3 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/30 text-sm text-[#EF4444]">
