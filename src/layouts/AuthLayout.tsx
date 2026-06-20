@@ -29,7 +29,7 @@ export function AuthLayout() {
             Create Viral <br/><span className="text-[#EF5350]">Clips in Seconds</span>
           </h1>
           <p className="text-lg text-[#616161] leading-relaxed">
-            Upload your long-form video and let our AI handle the rest. Automatic captions, smart highlights, and one-click publishing.
+            Upload your long-form video and let our AI handle the rest. Automatic captions, highlights, and one-click publishing.
           </p>
         </div>
       </div>

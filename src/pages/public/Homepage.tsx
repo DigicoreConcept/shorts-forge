@@ -132,10 +132,10 @@ const faqs = [
     q: "Do I own the clips?",
     a: "Yes. 100% of the generated content is yours. We don't claim any rights.",
   },
-  {
-    q: "Can I upload to YouTube automatically?",
-    a: "Yes — connect your YouTube account in the Channels section and publish with one click or schedule.",
-  },
+  // {
+  //   q: "Can I upload to YouTube automatically?",
+  //   a: "Yes — connect your YouTube account in the Channels section and publish with one click or schedule.",
+  // },
   {
     q: "Which languages are supported?",
     a: "We currently support 25+ languages for transcription and captioning. More added regularly.",
