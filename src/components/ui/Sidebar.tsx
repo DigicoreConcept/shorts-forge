@@ -1,8 +1,8 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { NavLink, useNavigate, Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   LayoutDashboard, FolderOpen, Film, Upload, Radio,
-  CreditCard, Settings, HelpCircle, Zap, LogOut, ChevronRight
+  CreditCard, Settings, HelpCircle, Zap, LogOut, ChevronRight, X
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
@@ -15,12 +15,11 @@ const navItems = [
 ]
 
 const bottomItems = [
-  { icon: CreditCard, label: 'Billing', to: '/dashboard/billing' },
   { icon: Settings, label: 'Settings', to: '/dashboard/settings' },
-  { icon: HelpCircle, label: 'Support', to: '#' },
+  { icon: HelpCircle, label: 'Support', to: '/dashboard/support' },
 ]
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
@@ -30,18 +29,43 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-60 h-screen flex flex-col bg-[#1A1A1A] border-r border-[#1A1A1A] fixed left-0 top-0 z-40">
-      {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-[#333333]">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/20">
-            <Zap size={14} className="text-white fill-white" />
-          </div>
-          <span className="font-bebas text-xl text-white tracking-widest mt-1">ReelCut</span>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 z-40 bg-black/50 lg:hidden backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Nav */}
+      <aside 
+        className={cn(
+          "w-60 h-screen flex flex-col bg-[#1A1A1A] border-r border-[#1A1A1A] fixed left-0 top-0 z-50 transition-transform duration-300 lg:translate-x-0 pt-12 md:pt-6",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <button 
+          onClick={onClose} 
+          className="absolute top-3 right-4 lg:hidden w-8 h-8 flex items-center justify-center bg-[#222] text-[#9E9E9E] hover:text-white rounded-md transition-colors z-50"
+        >
+          <X size={20} />
+        </button>
+        
+        <div className="flex items-center justify-between h-14 w-full pr-4">
+          <Link to="/" className="flex items-center px-6 gap-2 group h-full w-full" onClick={onClose}>
+            <img
+              src={"/reel-log-white.png"}
+              alt="ReelCut Logo"
+              className="w-full h-full rounded object-contain"
+            />
+          </Link>
+        </div>
+        {/* Nav */}
       <nav className="flex-1 py-6 overflow-y-auto space-y-1">
         {navItems.map((item) => (
           <NavLink
@@ -89,7 +113,7 @@ export function Sidebar() {
 
         {/* User */}
         <div className="mt-4 pt-4 px-4 border-t border-[#333333]">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-[#222222] transition-colors cursor-pointer" onClick={() => navigate('/dashboard/settings')}>
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-[#222222] transition-colors cursor-pointer" onClick={() => { onClose?.(); navigate('/dashboard/settings'); }}>
             <div className="w-8 h-8 rounded bg-[#EF5350]/20 flex items-center justify-center text-xs font-semibold text-[#EF5350] flex-shrink-0">
               {user?.full_name?.charAt(0)?.toUpperCase() ?? 'U'}
             </div>
@@ -104,5 +128,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   )
 }

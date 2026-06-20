@@ -101,6 +101,7 @@ function SuccessBurst() {
 
 export function ProcessingPage() {
   const { jobId } = useParams()
+  let videoId = null;
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
   const [stepStates, setStepStates] = useState<StepState[]>(['active', 'pending', 'pending', 'pending', 'pending'])
@@ -126,7 +127,7 @@ export function ProcessingPage() {
         const res = await api.get(`/v2/jobs/${jobId}/status`)
         if (res.data.success && res.data.data) {
           const data = res.data.data
-
+          
           // Check terminal states
           if (data.status === 'cancelled') {
             setCancelled(true)
@@ -171,7 +172,7 @@ export function ProcessingPage() {
           if (data.status === 'completed' || activeIndex >= 4) {
             setCompleted(true)
             setOverallProgress(100)
-            setTimeout(() => navigate('/dashboard/clips'), 2500)
+            setTimeout(() => navigate(`/dashboard/projects/${data.video_id}`), 2500)
           }
         }
       } catch (err) {
@@ -196,9 +197,14 @@ export function ProcessingPage() {
           <XCircle size={48} className="text-[#EF4444] mx-auto mb-4" />
           <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Job Cancelled</h2>
           <p className="text-[#9E9E9E] mb-6">The processing job was cancelled.</p>
-          <button onClick={() => navigate('/dashboard/upload')} className="px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors">
-            Start New Upload
-          </button>
+          <div className="flex items-center justify-center gap-3">
+            <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 rounded-xl border border-[#FFCDD2] bg-white text-[#1A1A1A] text-sm font-semibold hover:border-[#EF9090] hover:text-[#EF5350] transition-all">
+              Back to Dashboard
+            </button>
+            <button onClick={() => navigate('/dashboard/upload')} className="px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors">
+              Start New Upload
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -238,12 +244,22 @@ export function ProcessingPage() {
       <div className="relative z-10 w-full max-w-lg px-6">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-2 mb-4">
+          {/* <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
               <Zap size={14} className="text-white fill-white" />
             </div>
             <span className="font-bold text-[#1A1A1A]">ReelCut</span>
+          </div> */}
+
+          {/* Logo */}
+          <div className="mx-auto mb-4 h-auto w-32">
+              <img
+                src="/reel-logo-black.png"
+                className="h-full w-full object-contain"
+                alt="ReelCut Logo"
+              />
           </div>
+
           <AnimatePresence mode="wait">
             {completed ? (
               <motion.div key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>

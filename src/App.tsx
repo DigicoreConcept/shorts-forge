@@ -17,6 +17,7 @@ import { About } from '@/pages/public/About'
 import { Login } from '@/pages/auth/Login'
 import { Register } from '@/pages/auth/Register'
 import { ForgotPassword } from '@/pages/auth/ForgotPassword'
+import { ResetPassword } from '@/pages/auth/ResetPassword'
 import { VerifyAccount } from '@/pages/auth/VerifyAccount'
 
 // Dashboard pages
@@ -30,6 +31,7 @@ import { ProjectDetail } from '@/pages/dashboard/ProjectDetail'
 import { ChannelsPage } from '@/pages/dashboard/ChannelsPage'
 import { BillingPage } from '@/pages/dashboard/BillingPage'
 import { SettingsPage } from '@/pages/dashboard/SettingsPage'
+import { SupportPage } from '@/pages/dashboard/SupportPage'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
@@ -54,6 +56,7 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-account" element={<VerifyAccount />} />
           </Route>
 
@@ -69,8 +72,9 @@ export default function App() {
             <Route path="projects" element={<ProjectsPage />} />
             <Route path="projects/:id" element={<ProjectDetail />} />
             <Route path="channels" element={<ChannelsPage />} />
-            <Route path="billing" element={<BillingPage />} />
+            {/* <Route path="billing" element={<BillingPage />} /> */}
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="support" element={<SupportPage />} />
           </Route>
 
           {/* Fallback */}

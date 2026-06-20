@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Upload,
@@ -10,6 +10,8 @@ import {
   CheckCircle,
   Loader,
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
@@ -40,8 +42,8 @@ export function DashboardHome() {
 
     const fetchData = async () => {
       try {
-        const res = await api.get('/v1/users/dashboard/overview');
-        
+        const res = await api.get("/v1/users/dashboard/overview");
+
         if (!mounted) return;
 
         if (res.data.success && res.data.data) {
@@ -57,7 +59,7 @@ export function DashboardHome() {
     };
 
     fetchData(); // Initial fetch
-    
+
     // Poll every 20 minutes (20 * 60 * 1000 ms) as specified
     const iv = setInterval(fetchData, 1200000);
     return () => {
@@ -97,28 +99,52 @@ export function DashboardHome() {
     {
       icon: HardDrive,
       label: "Storage Used",
-      value: loading || !statsData ? "-" : formatStorage(statsData.storage_used_bytes),
-      sub: loading || !statsData ? "..." : `of ${formatStorage(statsData.storage_quota_bytes)} (${Math.round(statsData.storage_used_percent)}%)`,
+      value:
+        loading || !statsData
+          ? "-"
+          : formatStorage(statsData.storage_used_bytes),
+      sub:
+        loading || !statsData
+          ? "..."
+          : `of ${formatStorage(statsData.storage_quota_bytes)} (${Math.round(statsData.storage_used_percent)}%)`,
       color: "#F59E0B",
     },
   ];
 
   const getStatusConfig = (job: any) => {
     const status = job.status;
-    if (status === 'completed') return { icon: CheckCircle, label: "Completed", color: "text-[#22C55E]", bg: "bg-[#22C55E]/10" };
-    if (status === 'failed' || status === 'cancelled') return { icon: AlertCircle, label: status.charAt(0).toUpperCase() + status.slice(1), color: "text-[#EF4444]", bg: "bg-[#EF4444]/10" };
-    
+    if (status === "completed")
+      return {
+        icon: CheckCircle,
+        label: "Completed",
+        color: "text-[#22C55E]",
+        bg: "bg-[#22C55E]/10",
+      };
+    if (status === "failed" || status === "cancelled")
+      return {
+        icon: AlertCircle,
+        label: status.charAt(0).toUpperCase() + status.slice(1),
+        color: "text-[#EF4444]",
+        bg: "bg-[#EF4444]/10",
+      };
+
     let label = "Processing";
     if (job.current_step) {
-      const stepName = job.current_step.replace('_', ' ');
-      label = `${stepName.charAt(0).toUpperCase() + stepName.slice(1)} ${job.overall_progress ? `(${job.overall_progress}%)` : ''}`;
+      const stepName = job.current_step.replace("_", " ");
+      label = `${stepName.charAt(0).toUpperCase() + stepName.slice(1)} ${job.overall_progress ? `(${job.overall_progress}%)` : ""}`;
     }
 
-    return { icon: Loader, label, color: "text-[#F59E0B]", bg: "bg-[#F59E0B]/10", animate: true };
+    return {
+      icon: Loader,
+      label,
+      color: "text-[#F59E0B]",
+      bg: "bg-[#F59E0B]/10",
+      animate: true,
+    };
   };
 
   const handleJobClick = (job: any) => {
-    if (job.status === 'completed') {
+    if (job.status === "completed") {
       navigate(`/dashboard/clips?job_id=${job.job_id || job.id}`);
     } else {
       navigate(`/dashboard/processing/${job.job_id || job.id}`);
@@ -126,7 +152,7 @@ export function DashboardHome() {
   };
 
   return (
-    <div>
+    <div className="w-full min-w-0 max-w-full">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-[#1A1A1A]">
@@ -169,38 +195,7 @@ export function DashboardHome() {
       </div>
 
       {/* Recent Clips */}
-      {clips.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-[#1A1A1A]">Recent Clips</h2>
-            <Link to="/dashboard/clips" className="flex items-center gap-1 text-xs text-[#EF5350] hover:underline font-medium">
-              View all <ArrowRight size={12} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {clips.slice(0, 4).map((clip, i) => (
-              <motion.div
-                key={clip.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="group relative aspect-[9/16] rounded-2xl overflow-hidden bg-[#1A1A1A] border border-[#FFCDD2] shadow-sm hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => navigate(`/dashboard/clips/${clip.id}`)}
-              >
-                <div className="absolute inset-0 z-0">
-                  <VideoThumbnail src={clip.playback_url || ''} fallbackColor="#222" />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 z-20 pointer-events-none">
-                  <p className="text-white text-sm font-semibold line-clamp-2 leading-snug">
-                    {clip.ai_title || "Generated Clip"}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
+      <RecentClipsCarousel clips={clips} />
 
       {/* Recent jobs */}
       <div className="bg-[#FFFFFF] border border-[#FFCDD2] border-t-2 border-t-[#EF5350] rounded-lg overflow-hidden shadow-sm">
@@ -213,7 +208,7 @@ export function DashboardHome() {
             View all uploads <ArrowRight size={12} />
           </Link>
         </div>
-        
+
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="w-6 h-6 border-2 border-[#EF5350]/30 border-t-[#EF5350] rounded-full animate-spin" />
@@ -225,7 +220,7 @@ export function DashboardHome() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-[#FFCDD2]">
                   {["Job ID", "Status", "Clips", "Created", "Action"].map(
@@ -243,8 +238,8 @@ export function DashboardHome() {
               <tbody>
                 {jobs.map((job, i) => {
                   const s = getStatusConfig(job);
-                  const titleDisplay = `Job ${job.job_id?.slice(0, 8) || job.id?.slice(0, 8)}`;
-                  
+                  const titleDisplay = `Job ${job.job_id.replace("job_", "") || job.id?.slice(0, 8)}`;
+
                   return (
                     <motion.tr
                       key={job.job_id || job.id}
@@ -280,12 +275,17 @@ export function DashboardHome() {
                       </td>
                       <td className="px-6 py-4">
                         <span className="flex items-center gap-1 text-xs text-[#9E9E9E]">
-                          <Clock size={11} /> {new Date(job.created_at || new Date()).toLocaleDateString()}
+                          <Clock size={11} />{" "}
+                          {new Date(
+                            job.created_at || new Date(),
+                          ).toLocaleDateString()}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-xs text-[#EF5350] font-medium group-hover:underline">
-                          {job.status === 'completed' ? "View Clips" : "View Progress"}
+                          {job.status === "completed"
+                            ? "View Clips"
+                            : "View Progress"}
                         </span>
                       </td>
                     </motion.tr>
@@ -295,6 +295,104 @@ export function DashboardHome() {
             </table>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+function RecentClipsCarousel({ clips }: { clips: Clip[] }) {
+  const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+    window.addEventListener("resize", checkScroll);
+    return () => window.removeEventListener("resize", checkScroll);
+  }, [clips]);
+
+  const scrollBy = (offset: number) => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
+  if (!clips || clips.length === 0) return null;
+
+  return (
+    <div className="mb-8 relative group">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-semibold text-[#1A1A1A]">Recent Clips</h2>
+        <Link
+          to="/dashboard/clips"
+          className="flex items-center gap-1 text-xs text-[#EF5350] hover:underline font-medium"
+        >
+          View all <ArrowRight size={12} />
+        </Link>
+      </div>
+
+      <div className="relative w-full min-w-0">
+        <div
+          ref={scrollContainerRef}
+          onScroll={checkScroll}
+          className="flex overflow-x-auto gap-4 pb-4 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none'] scroll-smooth w-full min-w-0"
+        >
+          {clips.slice(0, 10).map((clip, i) => (
+            <motion.div
+              key={clip.id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="shrink-0 relative aspect-[9/16] w-[160px] md:w-[200px] max-h-80 snap-start rounded-2xl overflow-hidden bg-[#1A1A1A] border border-[#FFCDD2] shadow-sm hover:shadow-lg transition-all cursor-pointer"
+              onClick={() => navigate(`/dashboard/clips/${clip.id}`)}
+            >
+              <div className="absolute inset-0 z-0">
+                <VideoThumbnail
+                  src={clip.playback_url || ""}
+                  fallbackColor="#222"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 pointer-events-none" />
+              <div className="absolute bottom-0 left-0 right-0 p-4 z-20 pointer-events-none">
+                <p className="text-white text-sm font-semibold line-clamp-2 leading-snug">
+                  {clip.ai_title || "Generated Clip"}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Scroll Controls */}
+        <div className="flex justify-end gap-2 mt-1 pr-1 h-8">
+          {canScrollLeft && (
+            <button
+              onClick={() => scrollBy(-300)}
+              className="w-8 h-8 flex items-center justify-center bg-[#FFFFFF] border border-[#FFCDD2] text-[#1A1A1A] hover:bg-[#EF5350] hover:text-white transition-colors shadow-sm rounded-sm"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft size={16} />
+            </button>
+          )}
+          {canScrollRight && (
+            <button
+              onClick={() => scrollBy(300)}
+              className="w-8 h-8 flex items-center justify-center bg-[#FFFFFF] border border-[#FFCDD2] text-[#1A1A1A] hover:bg-[#EF5350] hover:text-white transition-colors shadow-sm rounded-sm"
+              aria-label="Scroll right"
+            >
+              <ChevronRight size={16} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

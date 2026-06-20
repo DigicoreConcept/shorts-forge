@@ -1,8 +1,8 @@
-import { Bell } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useLocation } from "react-router-dom";
 
-export function Topbar() {
+export function Topbar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user } = useAuthStore();
   const location = useLocation();
 
@@ -11,9 +11,15 @@ export function Topbar() {
   const title = path.charAt(0).toUpperCase() + path.slice(1);
 
   return (
-    <header className="h-16 fixed top-0 left-60 right-0 z-30 flex items-center justify-between px-8 border-b border-[#FFCDD2] bg-[#FFF5F5]/90 backdrop-blur-xl">
-      <div className="flex items-center">
-        <h1 className="font-bebas text-2xl text-[#1A1A1A] tracking-wider">
+    <header className="h-16 fixed top-0 left-0 lg:left-60 right-0 z-30 flex items-center justify-between px-4 md:px-8 border-b border-[#FFCDD2] bg-[#FFF5F5]/90 backdrop-blur-xl transition-all">
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={onMenuClick}
+          className="lg:hidden p-2 -ml-2 text-[#616161] hover:text-[#1A1A1A] hover:bg-[#FFEBEE] rounded-lg transition-colors"
+        >
+          <Menu size={20} />
+        </button>
+        <h1 className="font-bebas text-xl md:text-2xl text-[#1A1A1A] tracking-wider">
           {title}
         </h1>
       </div>

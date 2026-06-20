@@ -17,11 +17,12 @@ export function AuthLayout() {
         />
         
         <div className="relative z-10 max-w-lg">
-          <Link to="/" className="inline-flex items-center gap-2 group mb-12">
-            <div className="w-10 h-10 rounded-xl bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
-              <Zap size={20} className="text-white fill-white" />
-            </div>
-            <span className="font-bold text-2xl text-[#1A1A1A] tracking-tight">ReelCut</span>
+          <Link to="/" className="inline-flex items-center gap-2 group mb-12 h-10 w-auto">
+            <img
+              src={"/reel-logo-black.png"}
+              alt="ReelCut Logo"
+              className="w-full h-full rounded object-contain"
+            />
           </Link>
 
           <h1 className="text-5xl xl:text-7xl font-bebas text-[#1A1A1A] leading-none tracking-tight mb-6 uppercase">

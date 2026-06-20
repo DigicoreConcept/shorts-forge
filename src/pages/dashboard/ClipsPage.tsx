@@ -156,7 +156,7 @@ export function ClipsPage() {
           <p className="text-[#9E9E9E]">{search ? 'No clips match your search' : 'No clips found'}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {filtered.map((clip, i) => (
             <motion.div
               key={clip.id}
@@ -235,7 +235,7 @@ export function ClipsPage() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-4 max-w-sm w-full mx-auto shadow-2xl"
+              className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-4 max-w-sm w-full mx-auto max-h-[95vh] overflow-y-auto shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="aspect-[9/16] rounded-xl bg-black overflow-hidden flex items-center justify-center mb-4 relative">
@@ -244,7 +244,7 @@ export function ClipsPage() {
                     src={previewClip.playback_url} 
                     controls 
                     autoPlay 
-                    className="w-full h-full object-contain"
+                    className="w-full h-[400px] md:h-[600px] object-contain"
                   />
                 ) : (
                   <p className="text-xs text-[#9E9E9E]">No video URL available</p>

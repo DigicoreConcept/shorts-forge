@@ -185,13 +185,13 @@ export function ProjectDetail() {
       {/* Video Preview Modal */}
       {previewClip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1A1A]/90 backdrop-blur-sm">
-          <div className="bg-[#FFFFFF] rounded-3xl overflow-hidden max-w-4xl w-full flex flex-col md:flex-row shadow-2xl">
+          <div className="bg-[#FFFFFF] rounded-3xl overflow-hidden max-w-4xl w-full max-h-[95vh] overflow-y-auto flex flex-col md:flex-row shadow-2xl">
             <div className="w-full md:w-[400px] bg-black relative flex-shrink-0">
               <video
                 src={previewClip.playback_url}
                 controls
                 autoPlay
-                className="w-full h-[600px] object-contain"
+                className="w-full h-[400px] md:h-[600px] object-contain"
               />
             </div>
             <div className="p-8 flex-1 flex flex-col">

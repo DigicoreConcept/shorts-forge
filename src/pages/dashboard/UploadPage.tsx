@@ -168,9 +168,9 @@ export function UploadPage() {
               transition={{ duration: 0.2 }}
             >
               {!file ? (
-                <div
-                  {...getRootProps()}
-                  className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all ${
+                  <div
+                    {...getRootProps()}
+                    className={`border-2 border-dashed rounded-2xl p-6 md:p-12 text-center cursor-pointer transition-all ${
                     isDragActive
                       ? 'border-[#EF5350] bg-[#EF5350]/8'
                       : 'border-[#FFCDD2] bg-[#FFFFFF] hover:border-[#EF9090] hover:bg-[#FFF0F0]'
@@ -292,7 +292,7 @@ export function UploadPage() {
                   </button>
                 </div>
                 {timeRanges.map((r) => (
-                  <div key={r.id} className="flex items-center gap-3">
+                  <div key={r.id} className="flex flex-wrap items-center gap-3">
                     <input
                       type="text"
                       value={r.start}
@@ -323,7 +323,7 @@ export function UploadPage() {
         {/* Max Clips */}
         <div>
           <label className="block text-xs text-[#616161] mb-2 font-medium">Max Clips to Generate</label>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <button
               type="button"
               onClick={() => setMaxClips('auto')}
