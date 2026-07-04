@@ -62,7 +62,8 @@ Access at: `http://localhost:5173`
 ### Auth
 - **Login** — Email/password with remember me. Google OAuth stubbed (Coming Soon)
 - **Register** — Full name, email, password with confirm
-- **Forgot Password** — Email reset with success state
+- **Forgot Password** — Email reset link dispatch hitting `/v1/users/forgot-password`
+- **Reset Password** — Secure token-based password reset hitting `/v1/users/reset-password`
 
 ### Dashboard
 - **Dashboard Home** — 4 stat cards (uploads, clips, storage, credits) + recent jobs table
@@ -71,8 +72,9 @@ Access at: `http://localhost:5173`
 - **Clips** — Responsive grid, search, preview modal, edit/download/delete actions
 - **Clip Detail** — Video player, editable title/description/tags, copy-to-clipboard, regenerate
 - **Channels** — YouTube (connect ready), TikTok/Instagram (coming soon)
-- **Billing** — Plan + renewal info, usage bars with color-coded warnings, payment method
-- **Settings** — Tabs: Profile (avatar, name, email), Notifications (toggles), Security (password change, 2FA stub)
+- **Billing** — (Currently disabled/hidden pending further development)
+- **Settings** — Tabs: Profile (read-only global auth state view), Security (Send password reset link workflow, 2FA stub)
+- **Support** — Direct contact methods (Email, Chat, Docs) and an interactive FAQ accordion.
 
 ---
 
@@ -93,8 +95,8 @@ Access at: `http://localhost:5173`
 /dashboard/clips/:id       Clip Detail
 /dashboard/projects        Projects (stub)
 /dashboard/channels        Channels
-/dashboard/billing         Billing
 /dashboard/settings        Settings
+/dashboard/support         Support Center
 ```
 
 ---
@@ -107,10 +109,10 @@ All API calls are currently mocked. Replace the following stubs with real backen
 |---|---|---|
 | `Login.tsx` | Hardcoded user object | `POST /api/auth/login` |
 | `Register.tsx` | Hardcoded user object | `POST /api/auth/register` |
+| `Settings/Auth`| Connected to real endpoints | `POST /v1/users/forgot-password`, `POST /v1/users/reset-password` |
 | `UploadPage.tsx` | Generates fake jobId | `POST /api/jobs` |
 | `ProcessingPage.tsx` | Local state machine timer | `GET /api/jobs/:id` (poll) |
 | `ClipsPage.tsx` | `mockClips` array | `GET /api/clips` |
-| `BillingPage.tsx` | Hardcoded usage | `GET /api/billing/usage` |
 
 ---
 
