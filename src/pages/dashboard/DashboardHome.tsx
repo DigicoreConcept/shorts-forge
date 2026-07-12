@@ -68,6 +68,14 @@ export function DashboardHome() {
     };
   }, []);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Good morning";
+    if (hour >= 12 && hour < 17) return "Good afternoon";
+    if (hour >= 17 && hour < 22) return "Good evening";
+    return "Good night";
+  };
+
   const formatStorage = (bytes: number) => {
     if (!bytes) return "0 GB";
     const gb = bytes / (1024 * 1024 * 1024);
@@ -154,17 +162,17 @@ export function DashboardHome() {
   return (
     <div className="w-full min-w-0 max-w-full">
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">
-            Good morning, {user?.username?.split(" ")[0] ?? "there"} 👋
+        <div className="w-[60%] sm:w-auto">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">
+            {getGreeting()}, {user?.username?.split(" ")[0] ?? "there"}
           </h1>
-          <p className="text-sm text-[#9E9E9E] mt-1">
+          <p className="text-xs sm:text-sm text-[#9E9E9E] mt-1">
             Here's what's happening with your content today.
           </p>
         </div>
         <Link
           to="/dashboard/upload"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-all shadow-lg shadow-[#EF5350]/20"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-xs sm:text-sm font-semibold hover:bg-[#B71C1C] transition-all shadow-lg shadow-[#EF5350]/20"
         >
           <Upload size={15} /> New Upload
         </Link>
