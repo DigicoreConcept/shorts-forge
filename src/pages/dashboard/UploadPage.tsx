@@ -196,8 +196,8 @@ export function UploadPage() {
         subtitle: {
           style: selectedSubStyle,
           color: subtitleColor,
-          font: 'Inter',
-          size: 24,
+          font: 'Oswald',
+          size: 60,
           position: subtitlePosition
         }
       }
