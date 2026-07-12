@@ -10,7 +10,7 @@ export interface ApiResponse<T = any> {
 }
 
 export const api = axios.create({
-  baseURL: 'http://localhost:8005/api',
+  baseURL: '/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -35,6 +35,22 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       useAuthStore.getState().logout()
     }
+
+    // Check if the connection request failed due to lack of network or offline server
+    if (!error.response) {
+      const networkErrorMessage = 'Network connection error. Please check your connection.'
+      const customError = new Error(networkErrorMessage)
+      
+      // Inject standard response format to allow catching components to consume the message seamlessly
+      ;(customError as any).response = {
+        data: {
+          success: false,
+          message: networkErrorMessage
+        }
+      }
+      return Promise.reject(customError)
+    }
+
     return Promise.reject(error)
   }
 )

@@ -9,7 +9,15 @@ const __dirname = path.dirname(__filename)
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,
     port: 5273,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8005',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   resolve: {
     alias: {
