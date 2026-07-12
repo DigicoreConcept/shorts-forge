@@ -17,9 +17,11 @@ interface Step {
 
 const STEPS: Step[] = [
   { id: 0, icon: Upload,        label: 'Uploading',           sublabel: 'Transferring your video securely...', duration: 3 },
-  { id: 1, icon: Scissors,      label: 'Generating Clips',    sublabel: 'Extracting clips based on duration...', duration: 6 },
-  { id: 2, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
-  { id: 3, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
+  { id: 1, icon: Zap,           label: 'Generating Clips',    sublabel: 'Extracting semantic video segments...', duration: 6 },
+  { id: 2, icon: Mic2,          label: 'Transcribing',        sublabel: 'Converting voice audio to text...', duration: 4 },
+  { id: 3, icon: Scissors,      label: 'Editing',             sublabel: 'Applying dimensions, layouts & styles...', duration: 5 },
+  { id: 4, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
+  { id: 5, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
 ]
 
 type StepState = 'pending' | 'active' | 'done' | 'error'
@@ -104,7 +106,7 @@ export function ProcessingPage() {
   let videoId = null;
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(0)
-  const [stepStates, setStepStates] = useState<StepState[]>(['active', 'pending', 'pending', 'pending', 'pending'])
+  const [stepStates, setStepStates] = useState<StepState[]>(['active', 'pending', 'pending', 'pending', 'pending', 'pending'])
   const [stepProgress, setStepProgress] = useState(0)
   const [overallProgress, setOverallProgress] = useState(0)
   const [elapsed, setElapsed] = useState(0)
@@ -124,7 +126,7 @@ export function ProcessingPage() {
 
     const pollStatus = async () => {
       try {
-        const res = await api.get(`/v2/jobs/${jobId}/status`)
+        const res = await api.get(`/v1/jobs/${jobId}/status`)
         if (res.data.success && res.data.data) {
           const data = res.data.data
           
@@ -142,8 +144,10 @@ export function ProcessingPage() {
           const stepMap: Record<string, number> = {
             'uploading': 0,
             'generating_clips': 1,
-            'generating_metadata': 2,
-            'completed': 3
+            'transcribing': 2,
+            'editing': 3,
+            'generating_metadata': 4,
+            'completed': 5
           }
 
           const activeIndex = data.current_step && stepMap[data.current_step] !== undefined
@@ -163,13 +167,13 @@ export function ProcessingPage() {
               else next[i] = 'pending'
             }
             // If completed
-            if (data.status === 'completed' || activeIndex >= 4) {
-              next[4] = 'done'
+            if (data.status === 'completed' || activeIndex >= 5) {
+              next[5] = 'done'
             }
             return next
           })
 
-          if (data.status === 'completed' || activeIndex >= 4) {
+          if (data.status === 'completed' || activeIndex >= 5) {
             setCompleted(true)
             setOverallProgress(100)
             setTimeout(() => navigate(`/dashboard/projects/${data.video_id}`), 2500)
@@ -350,15 +354,15 @@ export function ProcessingPage() {
                       ) : i === 2 ? (
                         <WaveformAnimation />
                       ) : i === 3 ? (
-                        <TypingAnimation text="Generating: '5 AI Trends Changing Content Creation in 2024...'" />
-                      ) : i === 4 ? (
+                        <TypingAnimation text="Editing layouts and applying templates..." />
+                      ) : i === 5 ? (
                         <SuccessBurst />
                       ) : (
                         <p className="text-xs text-[#9E9E9E]">{step.sublabel}</p>
                       )}
 
                       {/* Step progress bar */}
-                      {i !== 4 && (
+                      {i !== 5 && (
                         <div className="mt-2 h-0.5 rounded-full bg-[#FFCDD2] overflow-hidden">
                           <motion.div
                             className="h-full rounded-full bg-[#EF5350]"
@@ -400,7 +404,7 @@ export function ProcessingPage() {
               onClick={async () => {
                 if (confirm('Cancel this job? Progress will be lost.')) {
                   try {
-                    await api.post(`/v2/jobs/${jobId}/cancel`)
+                    await api.post(`/v1/jobs/${jobId}/cancel`)
                     setCancelled(true)
                   } catch (err) {
                     console.error('Failed to cancel job:', err)

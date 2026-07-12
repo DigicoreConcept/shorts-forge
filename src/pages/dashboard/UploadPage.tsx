@@ -5,19 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, Link as LinkIcon, X, Plus, Trash2, Clock, Globe, Smartphone, Monitor, Square, LayoutTemplate, Maximize, Image as ImageIcon } from 'lucide-react'
 import { uploadVideoChunks } from '@/lib/upload'
 import { api } from '@/lib/api'
-
-type InputMode = 'file' | 'url'
-type ClipDuration = 30 | 60 | 90 | 'custom'
-type ClipDimension = '16:9' | '9:16' | '1:1'
-type ClipEffect = 'glassmorphism' | 'fit' | 'blurred_background'
-
-interface TimeRange {
-  id: string
-  start: string
-  end: string
-}
-
-const LANGUAGES = ['Auto-detect', 'English', 'Spanish', 'French', 'German', 'Portuguese', 'Arabic', 'Chinese', 'Japanese', 'Hindi']
+import { getVideoMetadata, type VideoMetadata } from '@/lib/utils'
+import {
+  type InputMode,
+  type ClipDuration,
+  type ClipDimension,
+  type TimeRange,
+  LANGUAGES,
+  LAYOUT_OPTIONS,
+  SUBTITLE_STYLES,
+  SUBTITLE_COLORS,
+  SUBTITLE_POSITIONS
+} from '@/lib/constants'
 
 const timeToSeconds = (timeStr: string) => {
   const parts = timeStr.split(':')
@@ -30,13 +29,20 @@ const timeToSeconds = (timeStr: string) => {
 export function UploadPage() {
   const [mode, setMode] = useState<InputMode>('file')
   const [file, setFile] = useState<File | null>(null)
+  const [metadata, setMetadata] = useState<VideoMetadata | null>(null)
+  const [resumableSession, setResumableSession] = useState<any | null>(null)
+  const [activeUploadId, setActiveUploadId] = useState<string | null>(null)
+  const [uploadPaused, setUploadPaused] = useState(false)
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
   const [language, setLanguage] = useState('Auto-detect')
   const [duration, setDuration] = useState<ClipDuration>(60)
   const [maxClips, setMaxClips] = useState<number | 'auto'>('auto')
   const [dimension, setDimension] = useState<ClipDimension>('9:16')
-  const [effect, setEffect] = useState<ClipEffect>('glassmorphism')
+  const [selectedLayout, setSelectedLayout] = useState<string>('glassmorphism')
+  const [selectedSubStyle, setSelectedSubStyle] = useState<string>('standard')
+  const [subtitleColor, setSubtitleColor] = useState<string>('#8B5CF6')
+  const [subtitlePosition, setSubtitlePosition] = useState<string>('bot-centre')
   const [timeRanges, setTimeRanges] = useState<TimeRange[]>([{ id: '1', start: '00:00', end: '01:00' }])
   const [submitting, setSubmitting] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -45,10 +51,62 @@ export function UploadPage() {
 
   const onDrop = useCallback((accepted: File[]) => {
     if (accepted[0]) {
-      setFile(accepted[0])
-      if (!title) setTitle(accepted[0].name.replace(/\.[^/.]+$/, ''))
+      const selectedFile = accepted[0]
+      setFile(selectedFile)
+      if (!title) setTitle(selectedFile.name.replace(/\.[^/.]+$/, ''))
+      
+      setMetadata(null)
+      setResumableSession(null)
+      setActiveUploadId(null)
+
+      getVideoMetadata(selectedFile)
+        .then((meta) => {
+          setMetadata(meta)
+        })
+        .catch((err) => {
+          console.error('Failed to parse video metadata:', err)
+        })
+
+      // Check for resumable session
+      const fingerprint = `${selectedFile.name}_${selectedFile.size}_${selectedFile.lastModified}`
+      const cached = localStorage.getItem(`reelcut_upload_session:${fingerprint}`)
+      if (cached) {
+        try {
+          const session = JSON.parse(cached)
+          // 20 minutes expiration check (20 * 60 * 1000 = 1,200,000 ms)
+          if (session.timestamp && Date.now() - session.timestamp > 1200000) {
+            localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
+          } else {
+            setResumableSession(session)
+          }
+        } catch (e) {
+          console.error('Failed to load resumable session:', e)
+        }
+      }
     }
   }, [title])
+
+  const handleAcceptResume = () => {
+    if (resumableSession) {
+      setTitle(resumableSession.formData.title)
+      setLanguage(resumableSession.formData.language)
+      setDimension(resumableSession.formData.dimension)
+      setSelectedLayout(resumableSession.formData.selectedLayout)
+      setSelectedSubStyle(resumableSession.formData.selectedSubStyle)
+      setSubtitleColor(resumableSession.formData.subtitleColor)
+      setSubtitlePosition(resumableSession.formData.subtitlePosition || 'bot-centre')
+      setActiveUploadId(resumableSession.uploadId)
+      setResumableSession(null)
+    }
+  }
+
+  const handleDeclineResume = () => {
+    if (file) {
+      const fingerprint = `${file.name}_${file.size}_${file.lastModified}`
+      localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
+    }
+    setResumableSession(null)
+  }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -71,16 +129,44 @@ export function UploadPage() {
     setSubmitting(true)
     setError('')
     setUploadProgress(0)
+    setUploadPaused(false)
 
     try {
       let video_id: string | undefined
       let source_url: string | undefined
 
       if (mode === 'file' && file) {
-        // 1. Chunked Upload
-        video_id = await uploadVideoChunks(file, (percent) => {
+        const fingerprint = `${file.name}_${file.size}_${file.lastModified}`
+        
+        const uploadRes = await uploadVideoChunks(file, (percent) => {
           setUploadProgress(percent)
+        }, {
+          uploadId: activeUploadId || undefined,
+          onPause: () => setUploadPaused(true),
+          onResume: () => setUploadPaused(false),
+          onChunkUploaded: (index, resolvedUploadId) => {
+            const totalChunks = Math.ceil(file.size / (5 * 1024 * 1024))
+            const sessionData = {
+              uploadId: resolvedUploadId,
+              lastChunkIndex: index,
+              totalChunks,
+              timestamp: Date.now(),
+              formData: {
+                title,
+                language,
+                dimension,
+                selectedLayout,
+                selectedSubStyle,
+                subtitleColor,
+                subtitlePosition
+              }
+            }
+            localStorage.setItem(`reelcut_upload_session:${fingerprint}`, JSON.stringify(sessionData))
+          }
         })
+        
+        video_id = uploadRes.videoId
+        localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
       } else if (mode === 'url') {
         source_url = url
       }
@@ -91,8 +177,8 @@ export function UploadPage() {
         language: language === 'Auto-detect' ? 'auto' : language,
         desired_duration: duration.toString(),
         dimension,
-        effect,
-        max_clips: maxClips === 'auto' ? 0 : maxClips,
+        effect: selectedLayout,
+        max_clips: maxClips === 'auto' ? null : maxClips,
         ...(video_id ? { video_id } : {}),
         ...(source_url ? { source_url } : {}),
         ...(duration === 'custom' ? {
@@ -100,10 +186,23 @@ export function UploadPage() {
             start: timeToSeconds(r.start),
             end: timeToSeconds(r.end)
           }))
-        } : {})
+        } : {}),
+        media_metadata: metadata ? {
+          duration: metadata.duration,
+          width: metadata.width,
+          height: metadata.height,
+          size: metadata.size
+        } : null,
+        subtitle: {
+          style: selectedSubStyle,
+          color: subtitleColor,
+          font: 'Inter',
+          size: 24,
+          position: subtitlePosition
+        }
       }
 
-      const res = await api.post('/v2/jobs/create', payload)
+      const res = await api.post('/v1/jobs/create', payload)
       
       if (res.data.success && res.data.data) {
         navigate(`/dashboard/processing/${res.data.data.job_id}`)
@@ -186,17 +285,75 @@ export function UploadPage() {
                   <p className="text-xs text-[#9E9E9E]">or click to browse — MP4, MOV, WebM, MP3, WAV up to 2GB</p>
                 </div>
               ) : (
-                <div className="flex items-center gap-4 p-4 bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl">
-                  <div className="w-10 h-10 rounded-xl bg-[#EF5350]/15 flex items-center justify-center flex-shrink-0">
-                    <Upload size={18} className="text-[#EF5350]" />
+                <div className="space-y-3">
+                  <div className="flex items-center gap-4 p-4 bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#EF5350]/15 flex items-center justify-center flex-shrink-0">
+                      <Upload size={18} className="text-[#EF5350]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-[#1A1A1A] truncate">{file.name}</p>
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[#FFEBEE] text-[#EF5350]">
+                          {(file.size / 1024 / 1024).toFixed(1)} MB
+                        </span>
+                        {metadata ? (
+                          <>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 text-[#616161]">
+                              {metadata.width} × {metadata.height} px
+                            </span>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-100 text-[#616161]">
+                              {Math.floor(metadata.duration / 60)}:
+                              {Math.round(metadata.duration % 60).toString().padStart(2, '0')} mins
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-xs text-[#9E9E9E] animate-pulse">Analyzing video headers...</span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFile(null)
+                        setMetadata(null)
+                        setResumableSession(null)
+                      }}
+                      className="text-[#9E9E9E] hover:text-[#EF4444] transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#1A1A1A] truncate">{file.name}</p>
-                    <p className="text-xs text-[#9E9E9E]">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
-                  </div>
-                  <button type="button" onClick={() => setFile(null)} className="text-[#9E9E9E] hover:text-[#EF4444] transition-colors">
-                    <X size={16} />
-                  </button>
+
+                  {resumableSession && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-[#FFF5F5] border border-[#FFCDD2] rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm"
+                    >
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-extrabold text-[#EF5350] uppercase tracking-wider">Interrupted Session Found</h4>
+                        <p className="text-xs text-[#616161]">
+                          We found a saved progress of {Math.round(((resumableSession.lastChunkIndex + 1) / resumableSession.totalChunks) * 100)}% for this file. Would you like to resume?
+                        </p>
+                      </div>
+                      <div className="flex gap-2 shrink-0 w-full sm:w-auto justify-end">
+                        <button
+                          type="button"
+                          onClick={handleAcceptResume}
+                          className="px-3 py-1.5 rounded-lg bg-[#EF5350] text-white text-[10px] font-bold hover:bg-[#B71C1C] transition-colors shadow-md shadow-[#EF5350]/15"
+                        >
+                          Resume
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleDeclineResume}
+                          className="px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#FFCDD2] text-[#616161] text-[10px] font-bold hover:bg-zinc-50 transition-colors"
+                        >
+                          Restart
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               )}
             </motion.div>
@@ -376,19 +533,27 @@ export function UploadPage() {
           <p className="text-xs text-[#9E9E9E] mt-2">If Auto is selected, ReelCut will extract as many clips as the video permits.</p>
         </div>
 
-        {/* Dimension */}
-        <div className="hidden">
-          <label className="block text-xs text-[#616161] mb-2 font-medium">Clip Dimension</label>
+        {/* Step 1: Target Aspect Ratio */}
+        <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 space-y-4">
+          <label className="block text-sm font-semibold text-[#1A1A1A]">1. Target Aspect Ratio</label>
           <div className="flex gap-2">
             {[
-              { id: '16:9', icon: Monitor, label: '16:9', desc: 'Landscape' },
-              { id: '9:16', icon: Smartphone, label: '9:16', desc: 'Portrait' },
-              { id: '1:1', icon: Square, label: '1:1', desc: 'Square' }
+              { id: '9:16', icon: Smartphone, label: '9:16', desc: 'Portrait (Mobile)' },
+              { id: '16:9', icon: Monitor, label: '16:9', desc: 'Landscape (Vlog)' },
+              { id: '1:1', icon: Square, label: '1:1', desc: 'Square (Feed)' }
             ].map((d) => (
               <button
                 key={d.id}
                 type="button"
-                onClick={() => setDimension(d.id as ClipDimension)}
+                onClick={() => {
+                  const val = d.id as ClipDimension;
+                  setDimension(val);
+                  // Dynamic filter check: if selectedLayout is not supported by new ratio, reset it
+                  const compatible = LAYOUT_OPTIONS.filter(o => o.supportedRatios.includes(val));
+                  if (!compatible.some(o => o.id === selectedLayout)) {
+                    setSelectedLayout(compatible[0]?.id || 'fit');
+                  }
+                }}
                 className={`flex-1 flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all ${
                   dimension === d.id
                     ? 'bg-[#EF5350] text-white border-[#EF5350] shadow-md shadow-[#EF5350]/20'
@@ -396,39 +561,170 @@ export function UploadPage() {
                 }`}
               >
                 <d.icon size={20} />
-                <span className="text-xs font-medium">{d.label}</span>
+                <span className="text-xs font-semibold">{d.label}</span>
                 <span className={`text-[10px] ${dimension === d.id ? 'text-[#FFCDD2]' : 'text-[#9E9E9E]'}`}>{d.desc}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Effect */}
-        <div className="hidden">
-          <label className="block text-xs text-[#616161] mb-2 font-medium">Background Effect</label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {[
-              { id: 'glassmorphism', icon: LayoutTemplate, label: 'Glassmorphism', desc: 'Frosted blur background' },
-              { id: 'fit', icon: Maximize, label: 'Fit to Screen', desc: 'Stretched or zoomed to fit' },
-              { id: 'blurred_background', icon: ImageIcon, label: 'Blurred Thumbnail', desc: 'Original size with blurred poster' }
-            ].map((e) => (
+        {/* Step 2: Dynamic Layout Selector (Based on Aspect Ratio) */}
+        <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 space-y-4">
+          <label className="block text-sm font-semibold text-[#1A1A1A]">2. Layout Style</label>
+          <p className="text-xs text-[#9E9E9E]">Select the video framing layout for your clips.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {LAYOUT_OPTIONS.filter(o => o.supportedRatios.includes(dimension)).map((o) => (
               <button
-                key={e.id}
+                key={o.id}
                 type="button"
-                onClick={() => setEffect(e.id as ClipEffect)}
-                className={`flex flex-col items-start p-3 rounded-xl border transition-all text-left ${
-                  effect === e.id
-                    ? 'bg-[#EF5350] text-white border-[#EF5350] shadow-md shadow-[#EF5350]/20'
-                    : 'bg-[#FFFFFF] text-[#616161] border-[#FFCDD2] hover:border-[#EF9090]'
+                onClick={() => setSelectedLayout(o.id)}
+                className={`flex flex-col items-center p-2 rounded-xl border transition-all text-center relative overflow-hidden group ${
+                  selectedLayout === o.id
+                    ? 'border-[#EF5350] bg-[#FFF5F5] ring-2 ring-[#EF5350]/30 shadow-md shadow-[#EF5350]/10'
+                    : 'border-[#FFCDD2] bg-[#FFFFFF] hover:border-[#EF9090]'
                 }`}
               >
-                <e.icon size={16} className={`mb-2 ${effect === e.id ? 'text-white' : 'text-[#EF5350]'}`} />
-                <span className="text-sm font-medium mb-0.5">{e.label}</span>
-                <span className={`text-[10px] leading-tight ${effect === e.id ? 'text-[#FFCDD2]' : 'text-[#9E9E9E]'}`}>{e.desc}</span>
+                <div className="aspect-[9/16] w-full rounded-lg bg-[#F5F5F5] overflow-hidden mb-2 relative flex items-center justify-center border border-[#FFCDD2]/50">
+                  {/* Visual placeholder using simple mock elements representing layout frames */}
+                  {o.id === 'glassmorphism' && (
+                    <div className="w-full h-full flex flex-col justify-between bg-zinc-200">
+                      <div className="w-full h-1/4 bg-zinc-400/50 backdrop-blur-md" />
+                      <div className="w-full h-2/4 bg-zinc-300 border-y border-zinc-400" />
+                      <div className="w-full h-1/4 bg-zinc-400/50 backdrop-blur-md" />
+                    </div>
+                  )}
+                  {o.id === 'fit' && (
+                    <div className="w-full h-full flex items-center justify-center bg-black">
+                      <div className="w-full h-1/3 bg-zinc-300 border-y border-zinc-400" />
+                    </div>
+                  )}
+                  {o.id === 'stretched' && (
+                    <div className="w-full h-full bg-zinc-300 flex items-center justify-center">
+                      <span className="text-[10px] text-zinc-500 uppercase tracking-tighter">Stretched</span>
+                    </div>
+                  )}
+                  {o.id === 'elongated' && (
+                    <div className="w-full h-full bg-zinc-300 overflow-hidden relative">
+                      <div className="absolute inset-2 border border-dashed border-[#EF5350]" />
+                    </div>
+                  )}
+                  {o.id === 'stacked' && (
+                    <div className="w-full h-full flex flex-col bg-zinc-200">
+                      <div className="w-full h-1/2 bg-zinc-300 border-b border-zinc-400" />
+                      <div className="w-full h-1/2 bg-zinc-200" />
+                    </div>
+                  )}
+                  {/* Label tag */}
+                  {selectedLayout === o.id && (
+                    <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#EF5350] flex items-center justify-center text-white text-[10px]">✓</div>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-[#1A1A1A]">{o.name}</span>
               </button>
             ))}
           </div>
         </div>
+
+        {/* Step 3: Subtitles Style */}
+        <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 space-y-4">
+          <label className="block text-sm font-semibold text-[#1A1A1A]">3. Subtitle Preset</label>
+          <p className="text-xs text-[#9E9E9E]">Choose how subtitles are displayed over your video.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {SUBTITLE_STYLES.map((s) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setSelectedSubStyle(s.id)}
+                className={`flex flex-col p-3 rounded-xl border transition-all text-left relative overflow-hidden ${
+                  selectedSubStyle === s.id
+                    ? 'border-[#EF5350] bg-[#FFF5F5] ring-2 ring-[#EF5350]/30 shadow-md'
+                    : 'border-[#FFCDD2] bg-[#FFFFFF] hover:border-[#EF9090]'
+                }`}
+              >
+                <div className="h-12 w-full rounded-lg bg-zinc-100 mb-2 border border-zinc-200/50 flex items-center justify-center p-2">
+                  {/* Text previews */}
+                  {s.id === 'standard' && (
+                    <span className="text-xs text-zinc-800 font-medium">Here is your subtitle</span>
+                  )}
+                  {s.id === 'bold_highlight' && (
+                    <span className="text-xs font-extrabold uppercase tracking-tight text-zinc-900">
+                      HERE IS <span style={{ color: subtitleColor }}>YOUR</span> SUBTITLE
+                    </span>
+                  )}
+                  {s.id === 'neon_glow' && (
+                    <span className="text-xs font-bold tracking-tight text-white bg-zinc-950 px-2 py-0.5 rounded shadow-lg shadow-black/20" style={{ textShadow: `0 0 8px ${subtitleColor}` }}>
+                      Here is your subtitle
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs font-bold text-[#1A1A1A]">{s.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Step 4: Subtitle Position (Grid Selector) */}
+        <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-semibold text-[#1A1A1A]">4. Subtitle Position</label>
+            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-800 tracking-wider">Beta Phase</span>
+          </div>
+          <p className="text-xs text-[#9E9E9E]">Choose where subtitles are overlayed on your video output. Currently, only Bottom Centre is active.</p>
+          
+          <div className="grid grid-cols-3 gap-2.5 max-w-sm mx-auto">
+            {SUBTITLE_POSITIONS.map((pos) => (
+              <button
+                key={pos.id}
+                type="button"
+                disabled={pos.disabled}
+                onClick={() => setSubtitlePosition(pos.id)}
+                className={`py-3 px-2 rounded-xl text-xs font-semibold border flex flex-col items-center justify-center gap-1 transition-all relative ${
+                  pos.disabled
+                    ? 'bg-zinc-50 border-zinc-200 text-zinc-400 opacity-60 cursor-not-allowed'
+                    : subtitlePosition === pos.id
+                      ? 'border-[#EF5350] bg-[#FFF5F5] text-[#EF5350] ring-2 ring-[#EF5350]/30 font-bold shadow-sm'
+                      : 'border-[#FFCDD2] bg-[#FFFFFF] text-[#616161] hover:border-[#EF9090]'
+                }`}
+              >
+                <span>{pos.label}</span>
+                {pos.disabled && (
+                  <span className="text-[8px] font-bold uppercase tracking-wider text-zinc-400">Beta</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Step 5: Highlight Color Picker (Conditional) */}
+        <AnimatePresence>
+          {SUBTITLE_STYLES.find(s => s.id === selectedSubStyle)?.supportsHighlight && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 space-y-4">
+                <label className="block text-sm font-semibold text-[#1A1A1A]">5. Highlight Accent Color</label>
+                <p className="text-xs text-[#9E9E9E]">Select the accent color for key words in your subtitles.</p>
+                <div className="flex gap-3">
+                  {SUBTITLE_COLORS.map((c) => (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setSubtitleColor(c.value)}
+                      className={`w-9 h-9 rounded-full ${c.bg} flex items-center justify-center text-white relative shadow-sm hover:scale-105 transition-all`}
+                    >
+                      {subtitleColor === c.value && (
+                        <span className="text-xs font-bold">✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <button
           type="submit"
@@ -474,10 +770,21 @@ export function UploadPage() {
               animate={{ scale: 1, y: 0 }}
               className="bg-[#FFFFFF] border border-[#FFCDD2] p-8 rounded-3xl shadow-2xl max-w-sm w-full mx-4 text-center"
             >
-              <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Uploading Video</h3>
-              <p className="text-sm text-[#9E9E9E] mb-8 leading-relaxed">
-                Please keep this window open while we securely transfer your file to our servers.
-              </p>
+              {uploadPaused ? (
+                <>
+                  <h3 className="text-xl font-bold text-[#F59E0B] mb-2">Connection Lost</h3>
+                  <p className="text-sm text-[#9E9E9E] mb-8 leading-relaxed">
+                    Your internet connection was interrupted. The upload is paused and will resume automatically once you are back online.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h3 className="text-xl font-bold text-[#1A1A1A] mb-2">Uploading Video</h3>
+                  <p className="text-sm text-[#9E9E9E] mb-8 leading-relaxed">
+                    Please keep this window open while we securely transfer your file to our servers.
+                  </p>
+                </>
+              )}
               
               <div className="relative w-40 h-40 mx-auto mb-8">
                 {/* Background Track */}
@@ -492,7 +799,7 @@ export function UploadPage() {
                   ></circle>
                   {/* Progress Ring */}
                   <circle
-                    className="text-[#EF5350] stroke-current transition-all duration-300 ease-out"
+                    className={`stroke-current transition-all duration-300 ease-out ${uploadPaused ? 'text-[#F59E0B]' : 'text-[#EF5350]'}`}
                     strokeWidth="8"
                     strokeLinecap="round"
                     cx="50"
@@ -503,11 +810,17 @@ export function UploadPage() {
                     strokeDashoffset={`${2 * Math.PI * 40 * (1 - uploadProgress / 100)}`}
                   ></circle>
                 </svg>
-                {/* Centered Percentage */}
+                {/* Centered Percentage or Pause */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl font-black text-[#1A1A1A] tracking-tighter">
-                    {uploadProgress}%
-                  </span>
+                  {uploadPaused ? (
+                    <span className="text-2xl font-black text-[#F59E0B] tracking-tighter animate-pulse">
+                      PAUSED
+                    </span>
+                  ) : (
+                    <span className="text-4xl font-black text-[#1A1A1A] tracking-tighter">
+                      {uploadProgress}%
+                    </span>
+                  )}
                 </div>
               </div>
             </motion.div>

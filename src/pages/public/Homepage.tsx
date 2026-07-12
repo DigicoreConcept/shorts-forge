@@ -70,25 +70,25 @@ const howItWorksSteps = [
     id: 1,
     title: "Upload Your Video",
     desc: "Drag and drop your raw podcast, webinar, or tutorial file, or paste a YouTube URL.",
-    image: "/images/step1_real.png",
+    image: "/images/hiw/step1_upload.png",
   },
   {
     id: 2,
     title: "Processing",
     desc: "The platform processes the audio and video to generate high-quality clips based on your chosen duration and timestamps.",
-    image: "/images/step2_real.png",
+    image: "/images/hiw/step2_processing.png",
   },
   {
     id: 3,
     title: "Automatic Captions",
     desc: "Clips are generated with dynamic captions and auto-reformatting for vertical screens.",
-    image: "/images/step3_real.png",
+    image: "/images/hiw/step3_clips.png",
   },
   {
     id: 4,
     title: "Review & Publish",
     desc: "Preview your shorts, tweak captions if needed, and publish directly to TikTok, Reels, and Shorts in one click.",
-    image: "/images/step3_real.png",
+    image: "/images/hiw/step3_clips.png",
   },
 ];
 
@@ -180,9 +180,9 @@ const pricingPlans = [
 ];
 
 const sliderImages = [
-  "/images/hero-center.png",
-  "/images/hero-right.png",
-  "/images/hero-left.png",
+  "/images/hero/hero-center.png",
+  "/images/hero/hero-right.png",
+  "/images/hero/hero-left.png",
 ];
 
 export function Homepage() {

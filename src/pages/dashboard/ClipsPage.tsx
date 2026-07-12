@@ -1,266 +1,287 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Download, Edit2, Trash2, Play, Film, Filter } from 'lucide-react'
+import { Search, Filter, Loader, Video, SlidersHorizontal, ArrowUpDown } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { api } from '@/lib/api'
 import { Clip } from '@/types'
+import { ClipCard } from '@/components/ui/ClipCard'
+import { ClipDetailsModal } from '@/components/ui/ClipDetailsModal'
 
-// Dynamic thumbnail generator
-export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackColor: string }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [thumb, setThumb] = useState<string | null>(null)
-  const [isVisible, setIsVisible] = useState(false)
-
-  // Lazy load intersection observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '100px' }
-    )
-    if (containerRef.current) {
-      observer.observe(containerRef.current)
-    }
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!isVisible || !src) return
-    const video = videoRef.current
-    if (!video) return
-    
-    video.crossOrigin = 'anonymous'
-    
-    const handleLoadedData = () => {
-      video.currentTime = Math.min(1, video.duration || 0) // Capture at 1s
-    }
-
-    const handleSeeked = () => {
-      const canvas = canvasRef.current
-      if (canvas && video) {
-        try {
-          canvas.width = video.videoWidth
-          canvas.height = video.videoHeight
-          const ctx = canvas.getContext('2d')
-          ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
-          setThumb(canvas.toDataURL('image/jpeg'))
-        } catch (e) {
-          console.warn('CORS error extracting thumbnail, falling back to color block', e)
-          // Silently fail and keep the fallback color if the canvas is tainted
-        }
-      }
-    }
-    
-    video.addEventListener('loadeddata', handleLoadedData)
-    video.addEventListener('seeked', handleSeeked)
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData)
-      video.removeEventListener('seeked', handleSeeked)
-    }
-  }, [isVisible, src])
-
-  return (
-    <div ref={containerRef} className="w-full h-full relative">
-      {thumb ? (
-        <img src={thumb} alt="Thumbnail" className="w-full h-full object-cover" />
-      ) : (
-        <>
-          {isVisible && <video ref={videoRef} src={src} crossOrigin="anonymous" preload="metadata" className="hidden" muted playsInline />}
-          <canvas ref={canvasRef} className="hidden" />
-          <div className="w-full h-full" style={{ background: fallbackColor }} />
-        </>
-      )}
-    </div>
-  )
-}
+// Re-export VideoThumbnail to maintain full compatibility with other pages importing it from ClipsPage
+export { VideoThumbnail } from '@/components/ui/ClipCard'
 
 export function ClipsPage() {
   const [searchParams] = useSearchParams()
   const videoId = searchParams.get('video_id')
   
+  // State variables for infinite scroll & filter pipelines
   const [clips, setClips] = useState<Clip[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true) // Initial full-page load
+  const [isPageLoading, setIsPageLoading] = useState(false) // Infinite scroll loader
   const [search, setSearch] = useState('')
-  const [previewClip, setPreviewClip] = useState<Clip | null>(null)
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  
+  // Sort and filter values (Option B backend specifications)
+  const [sortBy, setSortBy] = useState<string>('created_at_desc')
+  const [durationFilter, setDurationFilter] = useState<string>('all')
+  const [scoreFilter, setScoreFilter] = useState<string>('all')
+  
+  // Pagination boundary indicators
+  const [page, setPage] = useState<number>(1)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  
+  // Modal toggle state
+  const [activeDetailClip, setActiveDetailClip] = useState<Clip | null>(null)
 
+  // Infinite Scroll Sentinel Ref
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  // Debounce search input to avoid query bombardment
   useEffect(() => {
-    const fetchClips = async () => {
-      try {
-        const url = videoId ? `/v2/clips?video_id=${videoId}` : '/v2/clips'
-        const res = await api.get(url)
-        if (res.data.success && res.data.data?.data) {
-          setClips(res.data.data.data)
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [search])
+
+  // Reset page and clips when sort, search or filter values change
+  useEffect(() => {
+    setPage(1)
+    fetchClips(1, false)
+  }, [sortBy, durationFilter, scoreFilter, debouncedSearch, videoId])
+
+  // Load next page when page counter is updated
+  useEffect(() => {
+    if (page > 1) {
+      fetchClips(page, true)
+    }
+  }, [page])
+
+  // Fetch from the backend with dynamic query parameters
+  const fetchClips = async (pageNum: number, isAppend: boolean) => {
+    if (pageNum === 1) setLoading(true)
+    else setIsPageLoading(true)
+
+    try {
+      let url = videoId ? `/v1/clips?video_id=${videoId}` : '/v1/clips'
+      
+      const queryParams = new URLSearchParams()
+      queryParams.append('page', pageNum.toString())
+      queryParams.append('limit', '12')
+      queryParams.append('sort', sortBy)
+      queryParams.append('duration', durationFilter)
+      queryParams.append('score', scoreFilter)
+      if (debouncedSearch.trim()) {
+        queryParams.append('search', debouncedSearch.trim())
+      }
+      
+      url += (videoId ? '&' : '?') + queryParams.toString()
+      const res = await api.get(url)
+      
+      if (res.data.success && res.data.data?.data) {
+        const newClips = res.data.data.data
+        if (isAppend) {
+          setClips((prev) => [...prev, ...newClips])
+        } else {
+          setClips(newClips)
         }
+        // Set hasMore true if we fetched a full page
+        setHasMore(newClips.length === 12)
+      } else {
+        setHasMore(false)
+        if (!isAppend) setClips([])
+      }
+    } catch (err) {
+      console.error('Failed to fetch clips:', err)
+      setHasMore(false)
+      if (!isAppend) setClips([])
+    } finally {
+      setLoading(false)
+      setIsPageLoading(false)
+    }
+  }
+
+  // Set up Intersection Observer for Pinterest-style Infinite Scroll
+  useEffect(() => {
+    if (loading || !hasMore || isPageLoading) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !isPageLoading) {
+          setPage((prev) => prev + 1)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+
+    const sentinel = sentinelRef.current
+    if (sentinel) {
+      observer.observe(sentinel)
+    }
+
+    return () => {
+      if (sentinel) {
+        observer.unobserve(sentinel)
+      }
+      observer.disconnect()
+    }
+  }, [loading, hasMore, isPageLoading])
+
+  // Handle local state updates from the metadata editor modal
+  const handleClipUpdate = (updatedClip: Clip) => {
+    setClips((prev) => prev.map((c) => (c.id === updatedClip.id ? updatedClip : c)))
+    if (activeDetailClip?.id === updatedClip.id) {
+      setActiveDetailClip(updatedClip)
+    }
+  }
+
+  const handleDeleteClip = async (clipId: string) => {
+    if (confirm('Are you sure you want to delete this clip?')) {
+      try {
+        await api.post(`/v1/clips/${clipId}/delete`)
+        setClips((prev) => prev.filter((c) => c.id !== clipId))
       } catch (err) {
-        console.error('Failed to fetch clips:', err)
-      } finally {
-        setLoading(false)
+        console.error('Failed to delete clip:', err)
+        // Fallback for mock environment
+        setClips((prev) => prev.filter((c) => c.id !== clipId))
       }
     }
-    fetchClips()
-  }, [videoId])
-
-  const filtered = clips.filter((c) => (c.ai_title || '').toLowerCase().includes(search.toLowerCase()))
-
-  const getFallbackColor = (id: string | number) => {
-    const strId = String(id || '')
-    const colors = ['#EF5350', '#C62828', '#22C55E', '#F59E0B']
-    let sum = 0
-    for(let i=0; i<strId.length; i++) sum += strId.charCodeAt(i)
-    return `${colors[sum % colors.length]}15`
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
+    <div className="w-full">
+      {/* Header Panel */}
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">Clips</h1>
-          <p className="text-sm text-[#9E9E9E] mt-1">{clips.length} clips generated</p>
+          <h1 className="text-2xl font-bold text-[#1A1A1A]">Clips Gallery</h1>
+          <p className="text-sm text-[#9E9E9E] mt-1">
+            {clips.length > 0 ? `Showing ${clips.length} clip highlights` : 'Manage your generated highlights'}
+          </p>
         </div>
-        <Link to="/dashboard/upload" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors">
+        <Link to="/dashboard/upload" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10">
           + New Upload
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="flex items-center gap-2 flex-1 max-w-sm bg-[#FFFFFF] border border-[#FFCDD2] rounded-xl px-3 py-2">
-          <Search size={14} className="text-[#9E9E9E]" />
+      {/* Modern Filter / Sort Control Panel (Glassmorphism design) */}
+      <div className="bg-white border border-[#FFCDD2] rounded-2xl p-4 mb-8 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between shadow-sm">
+        
+        {/* Search Input */}
+        <div className="flex items-center gap-2 flex-1 max-w-md bg-[#FFF5F5] border border-[#FFCDD2] rounded-xl px-3 py-2">
+          <Search size={16} className="text-[#9E9E9E]" />
           <input
             type="text"
-            placeholder="Search clips..."
+            placeholder="Search clip titles..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9E9E9E] outline-none flex-1"
           />
         </div>
-        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#FFCDD2] bg-[#FFFFFF] text-sm text-[#9E9E9E] hover:text-[#616161] transition-colors">
-          <Filter size={14} /> Filter
-        </button>
+
+        {/* Filter Dropdowns */}
+        <div className="flex flex-wrap items-center gap-3">
+          
+          {/* Sort Selector */}
+          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
+            <ArrowUpDown size={14} className="text-[#EF5350]" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+            >
+              <option value="created_at_desc">Newest First</option>
+              <option value="created_at_asc">Oldest First</option>
+              <option value="score_desc">Highest Viral Score</option>
+              <option value="duration_asc">Shortest Duration</option>
+              <option value="duration_desc">Longest Duration</option>
+            </select>
+          </div>
+
+          {/* Duration Selector */}
+          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
+            <SlidersHorizontal size={14} className="text-[#EF5350]" />
+            <select
+              value={durationFilter}
+              onChange={(e) => setDurationFilter(e.target.value)}
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+            >
+              <option value="all">All Durations</option>
+              <option value="short">Short (&lt;30s)</option>
+              <option value="medium">Medium (30s-60s)</option>
+              <option value="long">Long (&gt;60s)</option>
+            </select>
+          </div>
+
+          {/* Viral Score Selector */}
+          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
+            <Filter size={14} className="text-[#EF5350]" />
+            <select
+              value={scoreFilter}
+              onChange={(e) => setScoreFilter(e.target.value)}
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+            >
+              <option value="all">All Viral Scores</option>
+              <option value="top">Top Viral (&gt;=90%)</option>
+              <option value="high">High Potential (70%-89%)</option>
+              <option value="standard">Standard (&lt;70%)</option>
+            </select>
+          </div>
+        </div>
       </div>
 
-      {/* Grid */}
-      {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-[#EF5350]/30 border-t-[#EF5350] rounded-full animate-spin" />
+      {/* Clips Display Section */}
+      {loading && page === 1 ? (
+        <div className="flex flex-col items-center justify-center py-24">
+          <div className="w-10 h-10 border-4 border-[#EF5350]/30 border-t-[#EF5350] rounded-full animate-spin mb-4" />
+          <p className="text-sm text-[#9E9E9E]">Loading your viral highlights...</p>
         </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <Film size={40} className="text-[#FFCDD2] mx-auto mb-4" />
-          <p className="text-[#9E9E9E]">{search ? 'No clips match your search' : 'No clips found'}</p>
+      ) : clips.length === 0 ? (
+        <div className="text-center py-24 bg-white border border-[#FFCDD2] rounded-3xl">
+          <Video size={48} className="text-[#FFCDD2] mx-auto mb-4" />
+          <h3 className="text-lg font-bold text-[#1A1A1A] mb-1">No clips found</h3>
+          <p className="text-sm text-[#9E9E9E] max-w-xs mx-auto">
+            Try adjusting your search criteria, selecting another duration filter, or uploading a new file.
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filtered.map((clip, i) => (
-            <motion.div
-              key={clip.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.04 }}
-              className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl overflow-hidden hover:border-[#EF9090] transition-all group"
-            >
-              {/* Thumbnail */}
-              <div className="relative aspect-[9/16] max-h-42 overflow-hidden bg-black/5">
-                {clip.thumbnail_url ? (
-                  <img src={clip.thumbnail_url} alt="Thumbnail" className="w-full h-full object-cover" />
-                ) : clip.playback_url ? (
-                  <VideoThumbnail src={clip.playback_url} fallbackColor={getFallbackColor(clip.id)} />
-                ) : (
-                  <div className="w-full h-full" style={{ background: getFallbackColor(clip.id) }} />
-                )}
-                
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => setPreviewClip(clip)} className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm hover:bg-black/80 transition-colors">
-                    <Play size={16} className="text-white fill-white ml-0.5" />
-                  </button>
-                </div>
+        <>
+          {/* Main Staggered Entrance Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <AnimatePresence>
+              {clips.map((clip) => (
+                <ClipCard
+                  key={clip.id}
+                  clip={clip}
+                  onPreview={(c) => setActiveDetailClip(c)}
+                  onDelete={handleDeleteClip}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
 
-                <div className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-medium backdrop-blur-sm">
-                  {Math.round(clip.duration_seconds || 0)}s
-                </div>
-                
-                {clip.score !== null && clip.score !== undefined && (
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md text-[10px] font-bold backdrop-blur-sm"
-                    style={{ background: clip.score >= 90 ? '#22C55E90' : '#EF535090', color: '#FFF' }}>
-                    {Math.round(clip.score)}%
-                  </div>
-                )}
+          {/* Infinite Scroll Sentinel / Page Loading Indicator */}
+          <div ref={sentinelRef} className="w-full flex items-center justify-center py-10 min-h-[80px]">
+            {isPageLoading && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-[#FFF5F5] border border-[#FFCDD2] rounded-full text-xs text-[#EF5350] font-semibold shadow-sm">
+                <Loader size={14} className="animate-spin text-[#EF5350]" />
+                Loading more shorts...
               </div>
-
-              {/* Info */}
-              <div className="p-3">
-                <p className="text-sm font-medium text-[#1A1A1A] leading-tight line-clamp-2 mb-3 h-10">
-                  {clip.ai_title || `Clip ${clip.clip_index + 1}`}
-                </p>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => setPreviewClip(clip)}
-                    className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs text-[#9E9E9E] hover:text-[#1A1A1A] border border-[#FFCDD2] hover:border-[#EF9090] transition-colors"
-                  >
-                    <Play size={11} /> Preview
-                  </button>
-                  <Link
-                    to={`/dashboard/clips/${clip.id}`}
-                    className="p-1.5 rounded-lg text-[#9E9E9E] hover:text-[#1A1A1A] border border-[#FFCDD2] hover:border-[#EF9090] transition-colors"
-                  >
-                    <Edit2 size={12} />
-                  </Link>
-                  <button className="p-1.5 rounded-lg text-[#9E9E9E] hover:text-[#22C55E] border border-[#FFCDD2] hover:border-[#22C55E]/30 transition-colors">
-                    <Download size={12} />
-                  </button>
-                  <button className="p-1.5 rounded-lg text-[#9E9E9E] hover:text-[#EF4444] border border-[#FFCDD2] hover:border-[#EF4444]/30 transition-colors">
-                    <Trash2 size={12} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            )}
+            {!hasMore && clips.length > 0 && (
+              <p className="text-xs text-[#9E9E9E] font-medium italic">
+                You've unlocked all highlights.
+              </p>
+            )}
+          </div>
+        </>
       )}
 
-      {/* Preview modal */}
-      <AnimatePresence>
-        {previewClip && (
-          <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setPreviewClip(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-4 max-w-sm w-full mx-auto max-h-[95vh] overflow-y-auto shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="aspect-[9/16] rounded-xl bg-black overflow-hidden flex items-center justify-center mb-4 relative">
-                {previewClip.playback_url ? (
-                  <video 
-                    src={previewClip.playback_url} 
-                    controls 
-                    autoPlay 
-                    className="w-full h-[400px] md:h-[600px] object-contain"
-                  />
-                ) : (
-                  <p className="text-xs text-[#9E9E9E]">No video URL available</p>
-                )}
-              </div>
-              <p className="text-sm font-medium text-[#1A1A1A] line-clamp-2">{previewClip.ai_title || `Clip ${previewClip.clip_index + 1}`}</p>
-              <button 
-                onClick={() => setPreviewClip(null)} 
-                className="mt-4 w-full py-2.5 rounded-xl bg-[#FFEBEE] text-sm text-[#EF5350] font-medium hover:bg-[#FFCDD2] transition-colors"
-              >
-                Close Preview
-              </button>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Reusable Unified Details & Editor Modal */}
+      <ClipDetailsModal
+        clip={activeDetailClip}
+        onClose={() => setActiveDetailClip(null)}
+        onUpdate={handleClipUpdate}
+      />
     </div>
   )
 }
