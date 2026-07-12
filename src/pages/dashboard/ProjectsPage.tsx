@@ -168,7 +168,6 @@ export function ProjectsPage() {
               <option value="completed">Completed</option>
               <option value="processing">Processing</option>
               <option value="failed">Failed</option>
-              <option value="no_jobs">No Jobs</option>
             </select>
           </div>
         </div>
