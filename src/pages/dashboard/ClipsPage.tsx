@@ -63,7 +63,7 @@ export function ClipsPage() {
     else setIsPageLoading(true)
 
     try {
-      let url = videoId ? `/v1/clips?video_id=${videoId}` : '/v1/clips'
+      let url = videoId ? `/v1/clips/?video_id=${videoId}` : '/v1/clips/'
       
       const queryParams = new URLSearchParams()
       queryParams.append('page', pageNum.toString())
