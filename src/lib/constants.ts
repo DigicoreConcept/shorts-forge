@@ -49,7 +49,7 @@ export const LAYOUT_OPTIONS: LayoutOption[] = [
   { id: 'fit', name: 'Fit Screen', imagePath: '/images/layouts/fit.png', supportedRatios: ['9:16', '16:9', '1:1'] },
   { id: 'stretched', name: 'Stretched', imagePath: '/images/layouts/stretched.png', supportedRatios: ['9:16'] },
   { id: 'elongated', name: 'Elongated', imagePath: '/images/layouts/elongated.png', supportedRatios: ['9:16'] },
-  { id: 'stacked', name: 'Stacked', imagePath: '/images/layouts/stacked.png', supportedRatios: ['9:16'] }
+  // { id: 'stacked', name: 'Stacked', imagePath: '/images/layouts/stacked.png', supportedRatios: ['9:16'] }
 ]
 
 export const SUBTITLE_STYLES: SubtitleStyleOption[] = [

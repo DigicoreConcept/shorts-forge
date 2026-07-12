@@ -271,7 +271,7 @@ export function DashboardHome() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-[#616161]">
-                        {job.clip_count ? `${job.clip_count} clips` : "—"}
+                        {job.max_clips ? `${job.max_clips} clips` : "—"}
                       </td>
                       <td className="px-6 py-4">
                         <span className="flex items-center gap-1 text-xs text-[#9E9E9E]">
