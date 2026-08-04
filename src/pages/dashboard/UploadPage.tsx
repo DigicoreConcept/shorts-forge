@@ -69,13 +69,13 @@ export function UploadPage() {
 
       // Check for resumable session
       const fingerprint = `${selectedFile.name}_${selectedFile.size}_${selectedFile.lastModified}`
-      const cached = localStorage.getItem(`reelcut_upload_session:${fingerprint}`)
+      const cached = localStorage.getItem(`excido_upload_session:${fingerprint}`)
       if (cached) {
         try {
           const session = JSON.parse(cached)
           // 20 minutes expiration check (20 * 60 * 1000 = 1,200,000 ms)
           if (session.timestamp && Date.now() - session.timestamp > 1200000) {
-            localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
+            localStorage.removeItem(`excido_upload_session:${fingerprint}`)
           } else {
             setResumableSession(session)
           }
@@ -103,7 +103,7 @@ export function UploadPage() {
   const handleDeclineResume = () => {
     if (file) {
       const fingerprint = `${file.name}_${file.size}_${file.lastModified}`
-      localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
+      localStorage.removeItem(`excido_upload_session:${fingerprint}`)
     }
     setResumableSession(null)
   }
@@ -161,12 +161,12 @@ export function UploadPage() {
                 subtitlePosition
               }
             }
-            localStorage.setItem(`reelcut_upload_session:${fingerprint}`, JSON.stringify(sessionData))
+            localStorage.setItem(`excido_upload_session:${fingerprint}`, JSON.stringify(sessionData))
           }
         })
         
         video_id = uploadRes.videoId
-        localStorage.removeItem(`reelcut_upload_session:${fingerprint}`)
+        localStorage.removeItem(`excido_upload_session:${fingerprint}`)
       } else if (mode === 'url') {
         source_url = url
       }

@@ -252,7 +252,7 @@ export function ProcessingPage() {
             <div className="w-8 h-8 rounded-lg bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
               <Zap size={14} className="text-white fill-white" />
             </div>
-            <span className="font-bold text-[#1A1A1A]">ReelCut</span>
+            <span className="font-bold text-[#1A1A1A]">Excido</span>
           </div> */}
 
           {/* Logo */}
@@ -260,7 +260,7 @@ export function ProcessingPage() {
               <img
                 src="/reel-logo-black.png"
                 className="h-full w-full object-contain"
-                alt="ReelCut Logo"
+                alt="Excido Logo"
               />
           </div>
 

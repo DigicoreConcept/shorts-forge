@@ -60,7 +60,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () =>
           <Link to="/" className="flex items-center px-6 gap-2 group h-full w-full" onClick={onClose}>
             <img
               src={"/reel-log-white.png"}
-              alt="ReelCut Logo"
+              alt="Excido Logo"
               className="w-full h-full rounded object-contain"
             />
           </Link>

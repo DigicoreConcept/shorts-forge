@@ -104,7 +104,7 @@ const testimonials = [
     name: "Marcus T.",
     role: "Podcast Host",
     avatar: "MT",
-    text: "ReelCut turned my 2-hour podcast into 30 clips in under 15 minutes. My YouTube Shorts channel went from 0 to 8k subs in a month.",
+    text: "Excido turned my 2-hour podcast into 30 clips in under 15 minutes. My YouTube Shorts channel went from 0 to 8k subs in a month.",
     stars: 5,
   },
   {
@@ -455,7 +455,7 @@ export function Homepage() {
             <h2 className="text-4xl sm:text-5xl font-bebas text-white leading-none mb-4">
               Watch a 58-minute podcast become 25 shorts
             </h2>
-            <p className="text-gray-400">See ReelCut in action.</p>
+            <p className="text-gray-400">See Excido in action.</p>
           </motion.div>
 
           <motion.div
@@ -681,7 +681,7 @@ export function Homepage() {
           <div className="flex flex-col md:flex-row items-center gap-12 mb-20 bg-[#FFFFFF] p-8 md:p-12 border border-[#FFCDD2] rounded-2xl">
             <div className="w-full md:w-2/3 pl-6 border-l-4 border-[#EF5350]">
               <p className="text-2xl md:text-3xl font-bold text-[#1A1A1A] italic leading-snug">
-                "ReelCut turned my 2-hour podcast into 30 viral clips in under
+                "Excido turned my 2-hour podcast into 30 viral clips in under
                 15 minutes. My YouTube Shorts channel went from 0 to 8k subs in
                 a month."
               </p>
@@ -776,7 +776,7 @@ export function Homepage() {
                   Beta Phase
                 </h3>
                 <p className="text-[#9E9E9E] text-sm mb-6">
-                  ReelCut is currently in a private beta phase. Join now to get
+                  Excido is currently in a private beta phase. Join now to get
                   100% free access before we launch.
                 </p>
                 <Link

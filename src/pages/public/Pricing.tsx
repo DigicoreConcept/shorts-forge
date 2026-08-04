@@ -230,7 +230,7 @@ export function Pricing() {
                   Beta Phase
                 </h3>
                 <p className="text-[#9E9E9E] text-sm mb-6">
-                  ReelCut is currently in a private beta phase. Join now to get
+                  Excido is currently in a private beta phase. Join now to get
                   100% free access before we launch.
                 </p>
                 <Link

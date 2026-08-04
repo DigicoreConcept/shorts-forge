@@ -20,7 +20,7 @@ export function AuthLayout() {
           <Link to="/" className="inline-flex items-center gap-2 group mb-12 h-10 w-auto">
             <img
               src={"/reel-logo-black.png"}
-              alt="ReelCut Logo"
+              alt="Excido Logo"
               className="w-full h-full rounded object-contain"
             />
           </Link>
@@ -40,7 +40,7 @@ export function AuthLayout() {
           <div className="w-8 h-8 rounded-xl bg-[#EF5350] flex items-center justify-center shadow-md">
             <Zap size={16} className="text-white fill-white" />
           </div>
-          <span className="font-bold text-xl text-[#1A1A1A]">ReelCut</span>
+          <span className="font-bold text-xl text-[#1A1A1A]">Excido</span>
         </Link>
 
         <motion.div

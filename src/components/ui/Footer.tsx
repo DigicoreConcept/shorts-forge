@@ -10,7 +10,7 @@ export function Footer() {
             <Link to="/" className="flex items-center gap-2 group h-16 w-40">
               <img
                 src={"/reel-logo-black.png"}
-                alt="ReelCut Logo"
+                alt="Excido Logo"
                 className="w-full h-full rounded object-contain"
               />
             </Link>
@@ -89,7 +89,7 @@ export function Footer() {
         <div className="border-t border-[#FFCDD2] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <p className="text-xs text-[#9E9E9E]">
-              © 2024 ReelCut. All rights reserved.
+              © 2024 Excido. All rights reserved.
             </p>
             <div className="flex items-center gap-4 text-xs text-[#9E9E9E]">
               <Link to="/privacy" className="hover:text-[#616161]">

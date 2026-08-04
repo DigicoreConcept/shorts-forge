@@ -41,7 +41,7 @@ export function Navbar() {
           <Link to="/" className="flex items-center gap-2 group h-16 w-40">
             <img
               src={showBg ? "/reel-logo-black.png" : "/reel-log-white.png"}
-              alt="ReelCut Logo"
+              alt="Excido Logo"
               className="w-full h-full rounded object-contain"
             />
           </Link>

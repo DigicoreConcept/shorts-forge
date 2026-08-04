@@ -1,17 +1,17 @@
-# ReelCut: Product Overview & Development Roadmap
+# Excido: Product Overview & Development Roadmap
 
 ## Executive Summary
-ReelCut is an AI-powered SaaS (Software as a Service) platform designed to automate the video editing pipeline for content creators, podcasters, and marketing agencies. 
+Excido is an AI-powered SaaS (Software as a Service) platform designed to automate the video editing pipeline for content creators, podcasters, and marketing agencies. 
 
-To explain it simply: Imagine you have a one-hour recording of a podcast or a keynote speech. Watching the entire video takes too long for the average scroller on social media. ReelCut acts as an intelligent, automated video editor. You give it the long video, and the platform rapidly analyzes the content to find the most engaging, viral-worthy 30-to-60-second segments. It automatically extracts those clips, crops them for mobile screens, adds dynamic text captions so they can be watched without sound, and prepares them to be posted directly to platforms like TikTok, YouTube Shorts, and Instagram Reels. 
+To explain it simply: Imagine you have a one-hour recording of a podcast or a keynote speech. Watching the entire video takes too long for the average scroller on social media. Excido acts as an intelligent, automated video editor. You give it the long video, and the platform rapidly analyzes the content to find the most engaging, viral-worthy 30-to-60-second segments. It automatically extracts those clips, crops them for mobile screens, adds dynamic text captions so they can be watched without sound, and prepares them to be posted directly to platforms like TikTok, YouTube Shorts, and Instagram Reels. 
 
-By turning one long video into dozens of bite-sized assets, ReelCut saves creators countless hours of tedious editing and maximizes the reach of their original content.
+By turning one long video into dozens of bite-sized assets, Excido saves creators countless hours of tedious editing and maximizes the reach of their original content.
 
 ---
 
 ## The Core Problem & Our Solution
 **The Problem:** Editing short-form content from long-form video requires expensive software, specialized skills, and hours of manual labor to hunt for the right moments and perfectly time the text captions.
-**The Solution:** ReelCut replaces the human editor with a streamlined AI pipeline. A creator simply drops a file or pastes a link, and minutes later, they receive a gallery of polished, ready-to-publish short clips.
+**The Solution:** Excido replaces the human editor with a streamlined AI pipeline. A creator simply drops a file or pastes a link, and minutes later, they receive a gallery of polished, ready-to-publish short clips.
 
 ---
 
@@ -60,8 +60,8 @@ This phase focuses on helping users manage scale. As users generate hundreds of 
 This final phase transitions the platform from a "video editor" into a full-scale content distribution business tool.
 
 *   **Automated Social Distribution (Channels)**
-    *   **OAuth Integrations:** Users will be able to connect their YouTube, TikTok, and Instagram accounts directly to ReelCut.
-    *   **One-Click Publishing:** Instead of downloading a clip to their hard drive and manually uploading it to TikTok, users can click "Publish" inside the Clip Detail view, and ReelCut will post it to their linked social accounts via API.
+    *   **OAuth Integrations:** Users will be able to connect their YouTube, TikTok, and Instagram accounts directly to Excido.
+    *   **One-Click Publishing:** Instead of downloading a clip to their hard drive and manually uploading it to TikTok, users can click "Publish" inside the Clip Detail view, and Excido will post it to their linked social accounts via API.
 
 *   **SaaS Billing & Credit System**
     *   **Subscription Tiers:** Implementation of tiered access (e.g., Starter, Creator, Agency) using a payment gateway like Stripe.

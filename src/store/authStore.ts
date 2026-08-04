@@ -21,6 +21,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user }),
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
     }),
-    { name: 'reelcut-auth' }
+    { name: 'excido-auth' }
   )
 )

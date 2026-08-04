@@ -42,7 +42,7 @@ export function SupportPage() {
           </div>
           <h3 className="font-bold text-[#1A1A1A] mb-2">Email Support</h3>
           <p className="text-sm text-[#616161] mb-4">Get help from our technical team within 24 hours.</p>
-          <span className="text-sm font-semibold text-[#EF5350]">support@reelcut.io</span>
+          <span className="text-sm font-semibold text-[#EF5350]">support@excido.app</span>
         </div>
 
         <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-6 hover:border-[#EF5350] transition-colors group cursor-pointer shadow-sm">
