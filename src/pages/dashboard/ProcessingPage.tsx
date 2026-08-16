@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Upload, Mic2, Scissors, FileText, CheckCircle2,
-  XCircle, Zap, Clock, AlertTriangle, DownloadCloud, ArrowLeft
+  XCircle, Zap, Clock, AlertTriangle, DownloadCloud, ArrowLeft, RotateCw
 } from 'lucide-react'
 import { api } from '@/lib/api'
 
@@ -111,18 +111,22 @@ export function ProcessingPage() {
   const [overallProgress, setOverallProgress] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [cancelled, setCancelled] = useState(false)
+  const [failed, setFailed] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [completed, setCompleted] = useState(false)
+  const [isRetrying, setIsRetrying] = useState(false)
+  const [isCancelling, setIsCancelling] = useState(false)
 
   // Elapsed timer
   useEffect(() => {
-    if (completed || cancelled) return
+    if (completed || cancelled || failed) return
     const iv = setInterval(() => setElapsed((e) => e + 1), 1000)
     return () => clearInterval(iv)
-  }, [completed, cancelled])
+  }, [completed, cancelled, failed])
 
   // Live API Polling
   useEffect(() => {
-    if (cancelled || completed || !jobId) return
+    if (cancelled || failed || completed || !jobId) return
 
     const pollStatus = async () => {
       try {
@@ -136,7 +140,10 @@ export function ProcessingPage() {
             return
           }
           if (data.status === 'failed') {
-            setCancelled(true)
+            setFailed(true)
+            if (data.error_message || data.message) {
+              setErrorMessage(data.error_message || data.message)
+            }
             return
           }
 
@@ -190,23 +197,90 @@ export function ProcessingPage() {
     // Then every 5s
     const iv = setInterval(pollStatus, 5000)
     return () => clearInterval(iv)
-  }, [jobId, cancelled, completed, navigate])
+  }, [jobId, cancelled, failed, completed, navigate])
 
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
-  if (cancelled) {
+  const handleRetry = async () => {
+    if (!jobId) return
+    setIsRetrying(true)
+    try {
+      const res = await api.post(`/v1/jobs/${jobId}/retry`)
+      if (res.data?.success && res.data?.data?.job_id) {
+        const newJobId = res.data.data.job_id
+        if (newJobId !== jobId) {
+          navigate(`/dashboard/processing/${newJobId}`)
+          return
+        }
+      }
+      setCancelled(false)
+      setFailed(false)
+      setErrorMessage(null)
+      setCompleted(false)
+      setCurrentStep(0)
+      setStepProgress(0)
+      setOverallProgress(0)
+      setElapsed(0)
+      setStepStates(['active', 'pending', 'pending', 'pending', 'pending', 'pending'])
+    } catch (err: any) {
+      console.error('Failed to retry job:', err)
+      const msg = err.response?.data?.message || err.message || 'Failed to retry job.'
+      alert(msg)
+    } finally {
+      setIsRetrying(false)
+    }
+  }
+
+  const handleCancel = async () => {
+    if (!jobId) return
+    if (confirm('Cancel this job? Progress will be lost.')) {
+      setIsCancelling(true)
+      try {
+        await api.post(`/v1/jobs/${jobId}/cancel`)
+        setCancelled(true)
+      } catch (err) {
+        console.error('Failed to cancel job:', err)
+        alert('Failed to cancel job.')
+      } finally {
+        setIsCancelling(false)
+      }
+    }
+  }
+
+  if (cancelled || failed) {
     return (
       <div className="fixed inset-0 bg-[#FFEBEE] flex items-center justify-center">
-        <div className="text-center">
+        {/* Back to Dashboard Navigation */}
+        <div className="absolute top-6 left-6 z-50">
+          <Link 
+            to="/dashboard"
+            className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md border border-[#FFCDD2] rounded-xl text-sm font-semibold text-[#1A1A1A] hover:bg-white hover:border-[#EF9090] hover:text-[#EF5350] transition-all shadow-sm"
+          >
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </Link>
+        </div>
+        <div className="text-center max-w-md px-6">
           <XCircle size={48} className="text-[#EF4444] mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">Job Cancelled</h2>
-          <p className="text-[#9E9E9E] mb-6">The processing job was cancelled.</p>
+          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">
+            {failed ? 'Job Failed' : 'Job Cancelled'}
+          </h2>
+          <p className="text-[#9E9E9E] mb-6">
+            {failed
+              ? (errorMessage || 'The processing job faced an error during execution.')
+              : 'The processing job was cancelled.'}
+          </p>
           <div className="flex items-center justify-center gap-3">
             <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 rounded-xl border border-[#FFCDD2] bg-white text-[#1A1A1A] text-sm font-semibold hover:border-[#EF9090] hover:text-[#EF5350] transition-all">
               Back to Dashboard
             </button>
-            <button onClick={() => navigate('/dashboard/upload')} className="px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors">
-              Start New Upload
+            <button
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50"
+            >
+              <RotateCw size={14} className={isRetrying ? 'animate-spin' : ''} />
+              {isRetrying ? 'Retrying...' : 'Retry Job'}
             </button>
           </div>
         </div>
@@ -397,24 +471,26 @@ export function ProcessingPage() {
           )}
         </AnimatePresence>
 
-        {/* Cancel */}
+        {/* Job Actions (Retry / Cancel) */}
         {!completed && (
-          <div className="text-center mt-4">
+          <div className="flex items-center justify-center gap-4 text-center mt-4">
             <button
-              onClick={async () => {
-                if (confirm('Cancel this job? Progress will be lost.')) {
-                  try {
-                    await api.post(`/v1/jobs/${jobId}/cancel`)
-                    setCancelled(true)
-                  } catch (err) {
-                    console.error('Failed to cancel job:', err)
-                    alert('Failed to cancel job.')
-                  }
-                }
-              }}
-              className="flex items-center gap-1.5 text-xs text-[#9E9E9E] hover:text-[#EF4444] transition-colors mx-auto"
+              onClick={handleRetry}
+              disabled={isRetrying || isCancelling}
+              className="flex items-center gap-1.5 text-xs text-[#9E9E9E] hover:text-[#EF5350] transition-colors disabled:opacity-50"
+              title="Retry processing for this job"
             >
-              <AlertTriangle size={12} /> Cancel Job
+              <RotateCw size={12} className={isRetrying ? 'animate-spin' : ''} />
+              {isRetrying ? 'Retrying...' : 'Retry Job'}
+            </button>
+            <span className="text-[#FFCDD2]">|</span>
+            <button
+              onClick={handleCancel}
+              disabled={isRetrying || isCancelling}
+              className="flex items-center gap-1.5 text-xs text-[#9E9E9E] hover:text-[#EF4444] transition-colors disabled:opacity-50"
+            >
+              <AlertTriangle size={12} />
+              {isCancelling ? 'Cancelling...' : 'Cancel Job'}
             </button>
           </div>
         )}
