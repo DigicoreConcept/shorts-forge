@@ -59,7 +59,7 @@ export function Sidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () =>
         <div className="flex items-center justify-between h-14 w-full pr-4">
           <Link to="/" className="flex items-center px-6 gap-2 group h-full w-full" onClick={onClose}>
             <img
-              src={"/reel-log-white.png"}
+              src={"/reel-logo-white.png"}
               alt="Excido Logo"
               className="w-full h-full rounded object-contain"
             />

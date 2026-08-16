@@ -272,7 +272,7 @@ export function Homepage() {
         {/* Content Container */}
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-12 pt-20 pb-12 lg:py-0">
           {/* Left Text */}
-          <div className="w-full lg:w-[30%] pl-0 lg:pl-10 xl:pl-12 flex flex-col items-start text-left">
+          <div className="w-full lg:w-[30%] max-sm:pt-5 pl-0 lg:pl-10 xl:pl-12 flex flex-col items-start text-left">
             <motion.h1
               initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}

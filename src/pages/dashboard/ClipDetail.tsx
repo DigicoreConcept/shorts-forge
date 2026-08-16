@@ -94,7 +94,7 @@ export function ClipDetail() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="mx-auto">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-sm text-[#9E9E9E] hover:text-[#616161] transition-colors mb-6"
@@ -104,7 +104,7 @@ export function ClipDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Player */}
-        <div className="lg:col-span-2 max-h-[85vh]">
+        <div className="lg:col-span-2 max-h-[75vh]">
           <div className="aspect-[9/16] bg-black border border-[#FFCDD2] rounded-2xl flex items-center justify-center sticky top-24 overflow-hidden relative">
             {clip.playback_url ? (
               <video
@@ -205,7 +205,7 @@ export function ClipDetail() {
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#EF5350]/15 border border-[#EF5350]/30 text-xs text-[#FFCDD2]"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#EF5350]/15 border border-[#EF5350]/30 text-xs text-[#9E9E9E]"
                   >
                     #{tag}
                     <button
