@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Access at: `http://localhost:5173`
+Access at: `http://localhost:5273`
 
 ---
 
