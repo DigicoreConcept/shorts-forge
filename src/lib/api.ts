@@ -1,6 +1,10 @@
 import axios from 'axios'
 import { useAuthStore } from '@/store/authStore'
 
+const apiUrl = import.meta.env.VITE_API_URL;
+const mediaUrl = import.meta.env.VITE_MEDIA_URL;
+const environment = import.meta.env.VITE_ENVIRONMENT;
+
 export interface ApiResponse<T = any> {
   success: boolean
   status: number
@@ -10,7 +14,7 @@ export interface ApiResponse<T = any> {
 }
 
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL:  environment === "prod" ? `${apiUrl}/api` : '/api',
   headers: {
     'Content-Type': 'application/json',
   },
