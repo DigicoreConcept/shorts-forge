@@ -6,6 +6,8 @@ export interface BlogPost {
   publishedAt: string
   readTime: string
   tags: string[]
+  image_url?: string
+  video_url?: string
   author: {
     name: string
     role: string
@@ -21,6 +23,8 @@ export const blogPosts: BlogPost[] = [
     publishedAt: 'August 12, 2026',
     readTime: '5 min read',
     tags: ['Productivity', 'YouTube Shorts', 'TikTok'],
+    image_url: 'https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80',
+    video_url: 'https://assets.mixkit.co/videos/preview/mixkit-hand-holding-a-smartphone-playing-a-video-41774-large.mp4',
     author: {
       name: 'Fakson',
       role: 'Founder, Excido',
@@ -51,6 +55,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: 'August 14, 2026',
     readTime: '4 min read',
     tags: ['Video Editing', 'Retention', 'Growth'],
+    image_url: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=800&q=80',
     author: {
       name: 'Fakson',
       role: 'Founder, Excido',
@@ -76,6 +81,7 @@ export const blogPosts: BlogPost[] = [
     publishedAt: 'August 16, 2026',
     readTime: '6 min read',
     tags: ['AI Analysis', 'Strategy', 'Analytics'],
+    image_url: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80',
     author: {
       name: 'Fakson',
       role: 'Founder, Excido',

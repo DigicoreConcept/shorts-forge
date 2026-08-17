@@ -13,7 +13,6 @@ export function BlogPost() {
   useEffect(() => {
     const fetchPost = async () => {
       try {
-        // Try versioned endpoint first
         const res = await api.get(`/v1/blogs/${slug}`)
         const data = res.data
         if (data.success && data.data) {
@@ -78,6 +77,7 @@ export function BlogPost() {
   }
 
   const imgUrl = post.image_url || post.imageUrl
+  const videoUrl = post.video_url || post.videoUrl
 
   return (
     <div className="flex flex-col w-full bg-[#FFEBEE] min-h-screen">
@@ -139,16 +139,6 @@ export function BlogPost() {
       {/* Article Content - centered layout block */}
       <section className="py-16 px-4">
         <div className="max-w-3xl mx-auto bg-white border border-[#FFCDD2] rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
-          {imgUrl && (
-            <div className="w-full aspect-video overflow-hidden rounded-2xl border border-[#FFCDD2] bg-gray-50">
-              <img 
-                src={imgUrl} 
-                alt={post.title} 
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-
           <article 
             className="prose prose-red text-[#1A1A1A] max-w-none 
               prose-headings:font-bebas prose-headings:tracking-wide prose-headings:text-[#1A1A1A]
@@ -159,6 +149,30 @@ export function BlogPost() {
               prose-strong:font-bold prose-strong:text-[#1A1A1A]"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
+
+          {/* Bottom Media block (Video if exists, otherwise Image) */}
+          {(videoUrl || imgUrl) && (
+            <div className="mt-12 pt-8 border-t border-[#FFEBEE]">
+              {videoUrl ? (
+                <div className="w-full aspect-video overflow-hidden rounded-2xl border border-[#FFCDD2] bg-black shadow-sm">
+                  <video 
+                    src={videoUrl} 
+                    controls 
+                    className="w-full h-full object-contain"
+                    poster={imgUrl}
+                  />
+                </div>
+              ) : (
+                <div className="w-full aspect-video overflow-hidden rounded-2xl border border-[#FFCDD2] bg-gray-50 shadow-sm">
+                  <img 
+                    src={imgUrl} 
+                    alt={post.title} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
     </div>

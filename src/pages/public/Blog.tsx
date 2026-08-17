@@ -14,7 +14,6 @@ export function Blog() {
 
     const fetchBlogs = async () => {
       try {
-        // Try versioned endpoint first
         const res = await api.get('/v1/blogs/')
         const data = res.data
         if (data.success && Array.isArray(data.data)) {
@@ -88,9 +87,18 @@ export function Blog() {
                     className="bg-white border border-[#FFCDD2] rounded-2xl overflow-hidden hover:border-[#EF5350] transition-colors shadow-sm flex flex-col justify-between"
                   >
                     <div>
-                      {/* Image header if exists */}
+                      {/* Title at the absolute top of the card */}
+                      <div className="p-6 pb-2">
+                        <h2 className="text-lg sm:text-xl font-bold text-[#1A1A1A] line-clamp-3 hover:text-[#EF5350] transition-colors leading-snug">
+                          <Link to={`/blog/${post.slug}`}>
+                            {post.title}
+                          </Link>
+                        </h2>
+                      </div>
+
+                      {/* Image immediately below the title */}
                       {imgUrl && (
-                        <div className="w-full aspect-video overflow-hidden border-b border-[#FFCDD2] bg-gray-50">
+                        <div className="w-full aspect-[16/10] overflow-hidden border-y border-[#FFCDD2] bg-gray-50">
                           <img 
                             src={imgUrl} 
                             alt={post.title} 
@@ -99,8 +107,9 @@ export function Blog() {
                         </div>
                       )}
 
+                      {/* Content block below the image */}
                       <div className="p-6">
-                        {/* Tags */}
+                        {/* Tags inside the card body content */}
                         {Array.isArray(post.tags) && post.tags.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-4">
                             {post.tags.map((tag: string) => (
@@ -111,13 +120,7 @@ export function Blog() {
                           </div>
                         )}
 
-                        <h2 className="text-xl font-bold text-[#1A1A1A] mb-3 line-clamp-2 hover:text-[#EF5350] transition-colors">
-                          <Link to={`/blog/${post.slug}`}>
-                            {post.title}
-                          </Link>
-                        </h2>
-
-                        <p className="text-sm text-[#616161] line-clamp-3 mb-6 leading-relaxed">
+                        <p className="text-sm text-[#616161] line-clamp-3 leading-relaxed">
                           {post.excerpt}
                         </p>
                       </div>
