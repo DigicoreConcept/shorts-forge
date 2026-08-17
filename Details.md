@@ -15,6 +15,14 @@ By turning one long video into dozens of bite-sized assets, Excido saves creator
 
 ---
 
+## Technical Architecture & Backend Stack
+*   **Transcription (Speech-to-Text):** OpenAI Whisper model is used to extract transcripts and timeline word boundaries.
+*   **Highlight Identification & Text Generation:** Powered by Mistral AI and Google Gemini AI, with future support planned for Alibaba Qwen.
+*   **Video Processing & Clipping Engine:** ffmpeg handles all video transcoding, trimming, aspect-ratio cropping, and caption rendering.
+*   **Clips Scoring:** Not calculated at this stage (currently utilizes duration-based segments and transcript context).
+
+---
+
 ## Comprehensive Feature Matrix
 
 The platform's development is broken down into structured phases. Below is the detailed breakdown of the features, their current status, and where they belong in the product roadmap.
