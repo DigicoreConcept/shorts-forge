@@ -48,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2">
               {[
                 ["About", "/about"],
-                ["Blog", "#"],
+                ["Blog", "/blog"],
                 ["Contact", "#"],
               ].map(([label, to]) => (
                 <li key={label}>

@@ -12,6 +12,10 @@ import { Homepage } from '@/pages/public/Homepage'
 import { Features } from '@/pages/public/Features'
 import { Pricing } from '@/pages/public/Pricing'
 import { About } from '@/pages/public/About'
+import { Privacy } from '@/pages/public/Privacy'
+import { Terms } from '@/pages/public/Terms'
+import { Blog } from '@/pages/public/Blog'
+import { BlogPost } from '@/pages/public/BlogPost'
 
 // Auth pages
 import { Login } from '@/pages/auth/Login'
@@ -49,6 +53,10 @@ export default function App() {
             <Route path="/features" element={<Features />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
           </Route>
 
           {/* Auth */}

@@ -195,7 +195,7 @@ export function ProcessingPage() {
     pollStatus()
     
     // Then every 5s
-    const iv = setInterval(pollStatus, 5000)
+    const iv = setInterval(pollStatus, 10000)
     return () => clearInterval(iv)
   }, [jobId, cancelled, failed, completed, navigate])
 

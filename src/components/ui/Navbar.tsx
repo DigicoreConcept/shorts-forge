@@ -8,6 +8,7 @@ const navLinks = [
   { label: "FEATURES", to: "/features" },
   { label: "PRICING", to: "/pricing" },
   { label: "ABOUT US", to: "/about" },
+  { label: "BLOG", to: "/blog" },
 ];
 
 export function Navbar() {
