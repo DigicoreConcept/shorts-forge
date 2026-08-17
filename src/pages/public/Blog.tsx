@@ -48,7 +48,7 @@ export function Blog() {
   }, [])
 
   return (
-    <div className="flex flex-col w-full bg-[#FFEBEE] min-h-screen">
+    <div className="flex flex-col w-full bg-gradient-to-b from-[#FFEBEE] via-[#FFEBEE]/30 to-white min-h-screen">
       {/* Hero Strip - full width background */}
       <section className="pt-32 pb-20 px-4 text-center border-b border-[#FFCDD2] relative overflow-hidden">
         <div 
