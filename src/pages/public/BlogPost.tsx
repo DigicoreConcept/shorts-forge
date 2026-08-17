@@ -80,7 +80,7 @@ export function BlogPost() {
   const videoUrl = post.video_url || post.videoUrl
 
   return (
-    <div className="flex flex-col w-full bg-gradient-to-b from-[#FFEBEE] via-[#FFEBEE]/50 via-[250px] to-white to-[500px] bg-white min-h-screen">
+    <div className="flex flex-col w-full bg-gradient-to-b from-[#FFEBEE] via-[#FFEBEE]/50 via-[650px] to-white to-[900px] bg-white min-h-screen">
       {/* Article Header strip - full width */}
       <section className="pt-32 pb-16 px-4 border-b border-[#FFCDD2] relative overflow-hidden">
         <div 
