@@ -102,10 +102,10 @@ export function ClipDetail() {
         <ArrowLeft size={15} /> Back to Clips
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Player */}
-        <div className="lg:col-span-2 max-h-[75vh]">
-          <div className="aspect-[9/16] bg-black border border-[#FFCDD2] rounded-2xl flex items-center justify-center sticky top-24 overflow-hidden relative">
+        <div className="lg:col-span-1">
+          <div className="aspect-[9/16] max-h-[80vh] bg-black border border-[#FFCDD2] rounded-2xl justify-self-end top-24 overflow-hidden sticky">
             {clip.playback_url ? (
               <video
                 src={clip.playback_url}
@@ -139,8 +139,8 @@ export function ClipDetail() {
         </div>
 
         {/* Metadata editor */}
-        <div className="lg:col-span-3 space-y-5">
-          <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-6">
+        <div className="lg:col-span-2 space-y-5">
+          <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-6 max-w-[80%]">
             <h1 className="text-lg font-bold text-[#1A1A1A] mb-5">
               Edit Metadata
             </h1>
