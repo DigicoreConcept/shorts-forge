@@ -138,7 +138,7 @@ export function BlogPost() {
 
       {/* Article Content - centered layout block */}
       <section className="py-16 px-4">
-        <div className="max-w-3xl mx-auto bg-white border border-[#FFCDD2] rounded-3xl p-8 sm:p-12 shadow-sm space-y-8">
+        <div className="max-w-3xl mx-auto rounded-3xl p-8 sm:p-12 space-y-8">
           <article 
             className="prose prose-red text-[#1A1A1A] max-w-none 
               prose-headings:font-bebas prose-headings:tracking-wide prose-headings:text-[#1A1A1A]
