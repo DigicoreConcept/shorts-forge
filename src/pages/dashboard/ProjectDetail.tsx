@@ -99,12 +99,12 @@ export function ProjectDetail() {
         {/* Background Pattern Accent */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#EF5350]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 relative z-10 w-full min-w-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 relative z-10 w-full min-w-0 flex-1">
           <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#FFEBEE] flex items-center justify-center flex-shrink-0 border border-[#FFCDD2]">
             <VideoIcon size={28} className="text-[#EF5350] sm:size-[32px]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1 leading-tight break-words">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1 leading-tight truncate" title={video.title}>
               {video.title}
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-semibold text-[#616161]">
@@ -128,7 +128,7 @@ export function ProjectDetail() {
       </div>
 
       {/* Clips Display Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 lg:gap-4">
         {clips.map((clip) => (
           <ClipCard
             key={clip.id}
