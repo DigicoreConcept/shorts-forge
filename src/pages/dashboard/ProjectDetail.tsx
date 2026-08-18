@@ -95,19 +95,19 @@ export function ProjectDetail() {
       </Link>
 
       {/* Hero Header Section (Glassmorphism layout) */}
-      <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-3xl p-8 mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden shadow-sm">
+      <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 sm:gap-6 relative overflow-hidden shadow-sm">
         {/* Background Pattern Accent */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#EF5350]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-        <div className="flex items-center gap-6 relative z-10">
-          <div className="w-20 h-20 rounded-2xl bg-[#FFEBEE] flex items-center justify-center flex-shrink-0 border border-[#FFCDD2]">
-            <VideoIcon size={32} className="text-[#EF5350]" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-5 relative z-10 w-full min-w-0">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#FFEBEE] flex items-center justify-center flex-shrink-0 border border-[#FFCDD2]">
+            <VideoIcon size={28} className="text-[#EF5350] sm:size-[32px]" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-[#1A1A1A] mb-1.5">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1 leading-tight break-words">
               {video.title}
             </h1>
-            <div className="flex items-center gap-4 text-xs font-semibold text-[#616161]">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-semibold text-[#616161]">
               <span>{new Date(video.created_at).toLocaleDateString()}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#D1D5DB]" />
               <span className="capitalize px-2 py-0.5 rounded-md bg-[#EF5350]/10 text-[#EF5350]">
@@ -117,18 +117,18 @@ export function ProjectDetail() {
           </div>
         </div>
 
-        <div className="relative z-10 bg-[#FFF5F5] border border-[#FFCDD2] px-8 py-5 rounded-2xl text-center md:min-w-[200px]">
-          <p className="text-4xl font-bebas text-[#EF5350] leading-none mb-1">
+        <div className="relative z-10 bg-[#FFF5F5] border border-[#FFCDD2] px-5 sm:px-8 py-3.5 sm:py-5 rounded-xl sm:rounded-2xl text-left sm:text-center w-full sm:w-auto md:min-w-[200px] flex sm:flex-col items-center justify-between sm:justify-center gap-2 sm:gap-0">
+          <p className="text-2xl sm:text-4xl font-bebas text-[#EF5350] leading-none">
             {clips.length}
           </p>
-          <p className="text-xs font-bold text-[#616161] uppercase tracking-wider">
+          <p className="text-[10px] sm:text-xs font-bold text-[#616161] uppercase tracking-wider">
             Clips Generated
           </p>
         </div>
       </div>
 
       {/* Clips Display Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-6">
         {clips.map((clip) => (
           <ClipCard
             key={clip.id}

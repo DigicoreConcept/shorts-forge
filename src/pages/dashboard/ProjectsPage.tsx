@@ -113,41 +113,44 @@ export function ProjectsPage() {
   return (
     <div>
       {/* Header Panel */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">Uploads</h1>
-          <p className="text-sm text-[#9E9E9E] mt-1">Manage your source videos and generated clips.</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">Uploads</h1>
+          <p className="text-xs sm:text-sm text-[#9E9E9E] mt-1">Manage your source videos and generated clips.</p>
         </div>
-        <Link to="/dashboard/upload" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10">
+        <Link to="/dashboard/upload" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-xs sm:text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10 w-full sm:w-auto text-center">
           + New Upload
         </Link>
       </div>
 
       {/* Control Filters (Glassmorphic look) */}
-      <div className="bg-white border border-[#FFCDD2] rounded-2xl p-4 mb-8 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between shadow-sm">
+      <div className="bg-white border border-[#FFCDD2] rounded-2xl p-3.5 sm:p-4 mb-6 sm:mb-8 flex flex-col lg:flex-row gap-3 sm:gap-4 items-stretch lg:items-center justify-between shadow-sm">
         
         {/* Search Field */}
-        <div className="flex items-center gap-2 flex-1 max-w-sm bg-[#FFF5F5] border border-[#FFCDD2] rounded-xl px-3 py-2">
-          <Search size={16} className="text-[#9E9E9E]" />
+        <div className="flex items-center gap-2 w-full lg:max-w-sm bg-[#FFF5F5] border border-[#FFCDD2] rounded-xl px-3 py-2">
+          <Search size={16} className="text-[#9E9E9E] flex-shrink-0" />
           <input
             type="text"
             placeholder="Search videos..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9E9E9E] outline-none flex-1"
+            className="bg-transparent text-xs sm:text-sm text-[#1A1A1A] placeholder:text-[#9E9E9E] outline-none flex-1 min-w-0"
           />
         </div>
 
         {/* Sort & Filter Dropdowns */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
           
           {/* Sorting */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
-            <ArrowUpDown size={14} className="text-[#EF5350]" />
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 bg-white border border-[#FFCDD2] px-3 py-2 sm:py-1.5 rounded-xl text-xs text-[#616161]">
+            <div className="flex items-center gap-1.5">
+              <ArrowUpDown size={14} className="text-[#EF5350] flex-shrink-0" />
+              <span className="text-[10px] uppercase font-bold text-[#9E9E9E] sm:hidden">Sort:</span>
+            </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer text-xs"
             >
               <option value="created_at_desc">Newest Upload</option>
               <option value="created_at_asc">Oldest Upload</option>
@@ -157,12 +160,15 @@ export function ProjectsPage() {
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
-            <Filter size={14} className="text-[#EF5350]" />
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 bg-white border border-[#FFCDD2] px-3 py-2 sm:py-1.5 rounded-xl text-xs text-[#616161]">
+            <div className="flex items-center gap-1.5">
+              <Filter size={14} className="text-[#EF5350] flex-shrink-0" />
+              <span className="text-[10px] uppercase font-bold text-[#9E9E9E] sm:hidden">Status:</span>
+            </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer text-xs"
             >
               <option value="all">All Statuses</option>
               <option value="completed">Completed</option>
@@ -179,7 +185,7 @@ export function ProjectsPage() {
           <div className="w-8 h-8 border-4 border-[#EF5350]/30 border-t-[#EF5350] rounded-full animate-spin" />
         </div>
       ) : videos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-[#FFCDD2] rounded-3xl">
+        <div className="flex flex-col items-center justify-center py-20 text-center bg-white border border-[#FFCDD2] rounded-3xl p-6">
           <div className="w-16 h-16 rounded-2xl bg-[#EF5350]/10 flex items-center justify-center mb-4 border border-[#FFCDD2]">
             <FolderOpen size={28} className="text-[#EF5350]" />
           </div>
@@ -193,40 +199,40 @@ export function ProjectsPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {videos.map((video) => (
               <Link
                 key={video.id}
                 to={`/dashboard/projects/${video.id}`}
-                className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-5 hover:border-[#EF9090] hover:shadow-md transition-all group block relative overflow-hidden"
+                className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-4 sm:p-5 hover:border-[#EF9090] hover:shadow-md transition-all group block relative overflow-hidden"
               >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#FFEBEE] flex items-center justify-center flex-shrink-0 border border-[#FFCDD2]">
-                    <Video size={20} className="text-[#EF5350]" />
+                <div className="flex items-start gap-3 sm:gap-4 mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#FFEBEE] flex items-center justify-center flex-shrink-0 border border-[#FFCDD2]">
+                    <Video size={18} className="text-[#EF5350]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-bold text-[#1A1A1A] truncate group-hover:text-[#EF5350] transition-colors">{video.title}</h3>
-                    <p className="text-xs text-[#9E9E9E] mt-1">{new Date(video.created_at).toLocaleDateString()}</p>
+                    <h3 className="text-xs sm:text-sm font-bold text-[#1A1A1A] truncate group-hover:text-[#EF5350] transition-colors">{video.title}</h3>
+                    <p className="text-[11px] sm:text-xs text-[#9E9E9E] mt-0.5 sm:mt-1">{new Date(video.created_at).toLocaleDateString()}</p>
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between pt-4 border-t border-[#FFEBEE]">
+                <div className="flex items-center justify-between pt-3.5 sm:pt-4 border-t border-[#FFEBEE] flex-wrap gap-2">
                   <div className="flex items-center gap-1.5 text-xs font-semibold">
                     {video.latest_job?.status === 'completed' ? (
-                      <span className="px-2.5 py-0.5 bg-[#22C55E]/10 text-[#22C55E] rounded-md">Completed</span>
+                      <span className="px-2.5 py-0.5 bg-[#22C55E]/10 text-[#22C55E] rounded-md text-[11px]">Completed</span>
                     ) : video.latest_job?.status === 'failed' ? (
-                      <span className="px-2.5 py-0.5 bg-[#EF4444]/10 text-[#EF4444] rounded-md">Failed</span>
+                      <span className="px-2.5 py-0.5 bg-[#EF4444]/10 text-[#EF4444] rounded-md text-[11px]">Failed</span>
                     ) : video.latest_job?.status ? (
-                      <span className="px-2.5 py-0.5 bg-[#F59E0B]/10 text-[#F59E0B] rounded-md flex items-center gap-1">
+                      <span className="px-2.5 py-0.5 bg-[#F59E0B]/10 text-[#F59E0B] rounded-md flex items-center gap-1 text-[11px]">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse" />
                         Processing
                       </span>
                     ) : (
-                      <span className="px-2.5 py-0.5 bg-[#9E9E9E]/10 text-[#616161] rounded-md">No Jobs</span>
+                      <span className="px-2.5 py-0.5 bg-[#9E9E9E]/10 text-[#616161] rounded-md text-[11px]">No Jobs</span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-[#616161]">
-                    <span>{video.total_clips} clips</span>
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[#616161]">
+                    <span className="text-[11px] sm:text-xs">{video.total_clips} clips</span>
                     <ChevronRight size={14} className="text-[#FFCDD2] group-hover:text-[#EF5350] transition-colors" />
                   </div>
                 </div>
