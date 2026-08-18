@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Upload, Mic2, Scissors, FileText, CheckCircle2,
+  Upload, Mic2, FileVideo, FileText, CheckCircle2,
   XCircle, Zap, Clock, AlertTriangle, DownloadCloud, ArrowLeft, RotateCw
 } from 'lucide-react'
 import { api } from '@/lib/api'
@@ -19,8 +19,8 @@ const STEPS: Step[] = [
   { id: 0, icon: Upload,        label: 'Uploading',           sublabel: 'Transferring your video securely...', duration: 3 },
   { id: 1, icon: Zap,           label: 'Generating Clips',    sublabel: 'Extracting semantic video segments...', duration: 6 },
   { id: 2, icon: Mic2,          label: 'Transcribing',        sublabel: 'Converting voice audio to text...', duration: 4 },
-  { id: 3, icon: Scissors,      label: 'Editing',             sublabel: 'Applying dimensions, layouts & styles...', duration: 5 },
-  { id: 4, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
+  { id: 3, icon: FileText,      label: 'Generating Metadata', sublabel: 'Writing titles, descriptions & tags...', duration: 4 },
+  { id: 4, icon: FileVideo,     label: 'Encoding Video',      sublabel: 'Encoding video streams & vertical layouts...', duration: 5 },
   { id: 5, icon: CheckCircle2,  label: 'Completed',           sublabel: 'Your clips are ready to publish!', duration: 1 },
 ]
 
@@ -152,8 +152,9 @@ export function ProcessingPage() {
             'uploading': 0,
             'generating_clips': 1,
             'transcribing': 2,
-            'editing': 3,
-            'generating_metadata': 4,
+            'generating_metadata': 3,
+            'encoding_video': 4,
+            'encoding': 4,
             'completed': 5
           }
 
@@ -428,7 +429,9 @@ export function ProcessingPage() {
                       ) : i === 2 ? (
                         <WaveformAnimation />
                       ) : i === 3 ? (
-                        <TypingAnimation text="Editing layouts and applying templates..." />
+                        <TypingAnimation text="Writing titles, descriptions & tags..." />
+                      ) : i === 4 ? (
+                        <TypingAnimation text="Encoding video resolution, layout & audio streams..." />
                       ) : i === 5 ? (
                         <SuccessBurst />
                       ) : (
