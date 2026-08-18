@@ -95,7 +95,7 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
   return (
     <AnimatePresence>
       <div 
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto"
+        className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md overflow-y-auto"
         onClick={onClose}
       >
         <motion.div
@@ -103,27 +103,28 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.3 }}
-          className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-3xl overflow-hidden max-w-4xl w-full shadow-2xl flex flex-col md:flex-row relative my-8"
+          className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl md:rounded-3xl overflow-hidden max-w-4xl w-full max-h-[92vh] md:max-h-[85vh] shadow-2xl flex flex-col md:flex-row relative my-auto sm:my-8"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 z-30 p-2 rounded-full bg-white/80 hover:bg-white text-[#9E9E9E] hover:text-[#1A1A1A] transition-colors shadow"
+            className="absolute top-3 right-3 md:top-4 md:right-4 z-30 p-2 rounded-full bg-white/90 hover:bg-white text-[#9E9E9E] hover:text-[#1A1A1A] transition-colors shadow-md"
+            aria-label="Close modal"
           >
             <X size={18} />
           </button>
 
           {/* Left Side: Video Player Container */}
-          <div className="w-full md:w-[380px] bg-black relative flex-shrink-0 flex items-center justify-center p-4">
-            <div className={`w-full relative rounded-2xl overflow-hidden shadow-inner max-h-[500px] md:max-h-[600px] ${aspectRatioClass}`}>
+          <div className="w-full md:w-[380px] bg-black relative flex-shrink-0 flex items-center justify-center p-3 md:p-4 max-h-[35vh] md:max-h-none">
+            <div className={`w-full h-full relative rounded-xl md:rounded-2xl overflow-hidden shadow-inner max-h-[220px] sm:max-h-[300px] md:max-h-[600px] flex items-center justify-center ${aspectRatioClass}`}>
               {clip.playback_url ? (
                 <video
                   src={clip.playback_url}
                   controls
                   autoPlay
                   onLoadedMetadata={handleLoadedMetadata}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   poster={clip.thumbnail_url || undefined}
                 />
               ) : (
@@ -135,13 +136,13 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
 
               {/* Dynamic Badges Overlay */}
               {clip.duration_seconds && (
-                <div className="absolute bottom-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded-lg text-xs text-white font-bold">
+                <div className="absolute bottom-2 right-2 md:bottom-3 md:right-3 px-2 py-0.5 md:py-1 bg-black/60 backdrop-blur-sm rounded-lg text-[10px] md:text-xs text-white font-bold">
                   {Math.round(clip.duration_seconds)}s
                 </div>
               )}
               {scoreVal > 0 && (
                 <div
-                  className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-xs font-bold backdrop-blur-sm uppercase font-bebas shadow-sm"
+                  className="absolute top-2 left-2 md:top-3 md:left-3 px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-bold backdrop-blur-sm uppercase font-bebas shadow-sm"
                   style={{
                     background: scoreVal >= 90 ? '#22C55EDD' : scoreVal >= 70 ? '#F59E0BDD' : '#EF5350DD',
                     color: '#FFF',
@@ -154,20 +155,20 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
           </div>
 
           {/* Right Side: Metadata Editor Form */}
-          <div className="p-6 md:p-8 flex-1 flex flex-col min-w-0 bg-[#FFF5F5]">
-            <div className="mb-6">
-              <span className="text-xs font-bold text-[#EF5350] uppercase tracking-wider font-bebas">
+          <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col min-w-0 bg-[#FFF5F5] overflow-y-auto">
+            <div className="mb-4 sm:mb-6 pr-6">
+              <span className="text-[10px] sm:text-xs font-bold text-[#EF5350] uppercase tracking-wider font-bebas">
                 Clip Highlights
               </span>
-              <h2 className="text-xl font-bold text-[#1A1A1A] truncate mt-1">
+              <h2 className="text-lg sm:text-xl font-bold text-[#1A1A1A] truncate mt-0.5">
                 {`Clip #${String(clip.clip_index).padStart(3, '0')}`}
               </h2>
             </div>
 
-            <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-3 sm:space-y-4 flex-1">
               {/* Title Field */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <label className="text-xs text-[#616161] font-semibold">Title</label>
                   <button
                     onClick={() => handleCopy(title, 'title')}
@@ -185,13 +186,13 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors"
+                  className="w-full px-3.5 py-2 sm:py-2.5 rounded-xl bg-white border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors"
                 />
               </div>
 
               {/* Description Field */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <label className="text-xs text-[#616161] font-semibold">Description</label>
                   <button
                     onClick={() => handleCopy(description, 'desc')}
@@ -208,14 +209,14 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors resize-none"
+                  rows={3}
+                  className="w-full px-3.5 py-2 sm:py-2.5 rounded-xl bg-white border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors resize-none"
                 />
               </div>
 
               {/* Tags Field */}
               <div>
-                <label className="block text-xs text-[#616161] font-semibold mb-1.5">Tags / Hashtags</label>
+                <label className="block text-xs text-[#616161] font-semibold mb-1">Tags / Hashtags</label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {tags.map((tag) => (
                     <span
@@ -247,7 +248,7 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
                   />
                   <button
                     onClick={handleAddTag}
-                    className="p-1.5 rounded-lg bg-[#EF5350] text-white hover:bg-[#B71C1C] transition-colors"
+                    className="p-1.5 rounded-lg bg-[#EF5350] text-white hover:bg-[#B71C1C] transition-colors flex-shrink-0"
                   >
                     <Plus size={14} />
                   </button>
@@ -256,12 +257,12 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center gap-3 pt-6 border-t border-[#FFCDD2] mt-6">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-[#FFCDD2] mt-4 sm:mt-6 sticky bottom-0 bg-[#FFF5F5] pb-1 z-10">
               <motion.button
                 onClick={handleSave}
                 disabled={saving}
                 whileTap={{ scale: 0.98 }}
-                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50 min-h-[42px]"
               >
                 {saving ? (
                   <RefreshCw size={15} className="animate-spin" />
@@ -277,7 +278,7 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
                 onClick={() => {
                   if (clip.playback_url) window.open(clip.playback_url, '_blank')
                 }}
-                className="flex items-center gap-2 px-4 py-3 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors min-h-[42px]"
                 disabled={!clip.playback_url}
               >
                 <Download size={15} /> Download

@@ -112,7 +112,7 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
       onClick={() => onPreview(clip)}
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-[9/16] max-h-64 overflow-hidden bg-black/5 flex-shrink-0">
+      <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/5 flex-shrink-0">
         {clip.thumbnail_url ? (
           <img src={clip.thumbnail_url} alt="Thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : clip.playback_url ? (
@@ -126,15 +126,15 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
           <motion.div 
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            className="w-12 h-12 rounded-full bg-[#EF5350] text-white flex items-center justify-center shadow-lg shadow-[#EF5350]/30"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#EF5350] text-white flex items-center justify-center shadow-lg shadow-[#EF5350]/30"
           >
-            <Play size={20} className="text-white fill-white ml-0.5" />
+            <Play size={18} className="text-white fill-white ml-0.5" />
           </motion.div>
         </div>
 
         {/* Duration Badge */}
         {clip.duration_seconds !== undefined && clip.duration_seconds !== null && (
-          <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-black/60 text-white text-[10px] font-bold backdrop-blur-sm tracking-wider">
+          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded bg-black/60 text-white text-[10px] font-bold backdrop-blur-sm tracking-wider">
             {Math.round(clip.duration_seconds)}s
           </div>
         )}
@@ -142,7 +142,7 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
         {/* Viral Score Badge */}
         {scoreVal > 0 && (
           <div 
-            className="absolute top-3 left-3 px-2 py-1 rounded text-[10px] font-bold backdrop-blur-sm tracking-wider shadow-sm uppercase font-bebas"
+            className="absolute top-2 left-2 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-[10px] font-bold backdrop-blur-sm tracking-wider shadow-sm uppercase font-bebas"
             style={{ 
               background: isHighViral ? '#22C55EDD' : isMidViral ? '#F59E0BDD' : '#EF5350DD', 
               color: '#FFF' 
@@ -154,20 +154,20 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
       </div>
 
       {/* Clip Content Details */}
-      <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-bold text-[#1A1A1A] text-xs mb-1.5 uppercase tracking-wider font-bebas text-[#EF5350]">
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
+        <h3 className="font-bold text-xs mb-1 uppercase tracking-wider font-bebas text-[#EF5350]">
           {`Clip #${String(clip.clip_index).padStart(3, '0')}`}
         </h3>
         
-        <p className="text-sm font-semibold text-[#1A1A1A] leading-snug line-clamp-2 mb-3 flex-1">
+        <p className="text-xs sm:text-sm font-semibold text-[#1A1A1A] leading-snug line-clamp-2 mb-2.5 flex-1">
           {clip.ai_title || 'Untitled Highlight'}
         </p>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-1.5 pt-3 border-t border-[#FFEBEE]">
+        <div className="flex items-center gap-1.5 pt-2.5 border-t border-[#FFEBEE]">
           <button
             onClick={(e) => { e.stopPropagation(); onPreview(clip); }}
-            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-semibold text-[#EF5350] bg-[#FFF5F5] hover:bg-[#FFEBEE] transition-colors border border-transparent"
+            className="flex-1 flex items-center justify-center gap-1 py-1.5 sm:py-2 rounded-lg text-xs font-semibold text-[#EF5350] bg-[#FFF5F5] hover:bg-[#FFEBEE] transition-colors border border-transparent min-h-[36px]"
           >
             <Play size={11} className="fill-current" /> Preview
           </button>
@@ -175,7 +175,7 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
           <button
             onClick={handleDownload}
             disabled={!clip.playback_url}
-            className="p-2 rounded-lg text-[#9E9E9E] hover:text-[#1A1A1A] border border-[#FFCDD2] hover:border-[#EF9090] transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-lg text-[#9E9E9E] hover:text-[#1A1A1A] border border-[#FFCDD2] hover:border-[#EF9090] transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed min-h-[36px] min-w-[36px] flex items-center justify-center"
             title="Download Clip"
           >
             <Download size={12} />
@@ -184,7 +184,7 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
           {onDelete && (
             <button
               onClick={(e) => { e.stopPropagation(); onDelete(clip.id); }}
-              className="p-2 rounded-lg text-[#9E9E9E] hover:text-[#EF4444] border border-[#FFCDD2] hover:border-[#EF4444]/30 transition-colors flex-shrink-0"
+              className="p-2 rounded-lg text-[#9E9E9E] hover:text-[#EF4444] border border-[#FFCDD2] hover:border-[#EF4444]/30 transition-colors flex-shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
               title="Delete Clip"
             >
               <Trash2 size={12} />

@@ -151,43 +151,46 @@ export function ClipsPage() {
   return (
     <div className="w-full">
       {/* Header Panel */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A1A]">Clips Gallery</h1>
-          <p className="text-sm text-[#9E9E9E] mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">Clips Gallery</h1>
+          <p className="text-xs sm:text-sm text-[#9E9E9E] mt-1">
             {clips.length > 0 ? `Showing ${clips.length} clip highlights` : 'Manage your generated highlights'}
           </p>
         </div>
-        <Link to="/dashboard/upload" className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10">
+        <Link to="/dashboard/upload" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-xs sm:text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10 w-full sm:w-auto text-center">
           + New Upload
         </Link>
       </div>
 
       {/* Modern Filter / Sort Control Panel (Glassmorphism design) */}
-      <div className="bg-white border border-[#FFCDD2] rounded-2xl p-4 mb-8 flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between shadow-sm">
+      <div className="bg-white border border-[#FFCDD2] rounded-2xl p-3.5 sm:p-4 mb-6 sm:mb-8 flex flex-col lg:flex-row gap-3 sm:gap-4 items-stretch lg:items-center justify-between shadow-sm">
         
         {/* Search Input */}
-        <div className="flex items-center gap-2 flex-1 max-w-md bg-[#FFF5F5] border border-[#FFCDD2] rounded-xl px-3 py-2">
-          <Search size={16} className="text-[#9E9E9E]" />
+        <div className="flex items-center gap-2 w-full lg:max-w-md bg-[#FFF5F5] border border-[#FFCDD2] rounded-xl px-3 py-2">
+          <Search size={16} className="text-[#9E9E9E] flex-shrink-0" />
           <input
             type="text"
             placeholder="Search clip titles..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent text-sm text-[#1A1A1A] placeholder:text-[#9E9E9E] outline-none flex-1"
+            className="bg-transparent text-xs sm:text-sm text-[#1A1A1A] placeholder:text-[#9E9E9E] outline-none flex-1 min-w-0"
           />
         </div>
 
         {/* Filter Dropdowns */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 w-full lg:w-auto">
           
           {/* Sort Selector */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
-            <ArrowUpDown size={14} className="text-[#EF5350]" />
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 bg-white border border-[#FFCDD2] px-3 py-2 sm:py-1.5 rounded-xl text-xs text-[#616161]">
+            <div className="flex items-center gap-1.5">
+              <ArrowUpDown size={14} className="text-[#EF5350] flex-shrink-0" />
+              <span className="text-[10px] uppercase font-bold text-[#9E9E9E] sm:hidden">Sort:</span>
+            </div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer text-xs"
             >
               <option value="created_at_desc">Newest First</option>
               <option value="created_at_asc">Oldest First</option>
@@ -198,12 +201,15 @@ export function ClipsPage() {
           </div>
 
           {/* Duration Selector */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
-            <SlidersHorizontal size={14} className="text-[#EF5350]" />
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 bg-white border border-[#FFCDD2] px-3 py-2 sm:py-1.5 rounded-xl text-xs text-[#616161]">
+            <div className="flex items-center gap-1.5">
+              <SlidersHorizontal size={14} className="text-[#EF5350] flex-shrink-0" />
+              <span className="text-[10px] uppercase font-bold text-[#9E9E9E] sm:hidden">Duration:</span>
+            </div>
             <select
               value={durationFilter}
               onChange={(e) => setDurationFilter(e.target.value)}
-              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer text-xs"
             >
               <option value="all">All Durations</option>
               <option value="short">Short (&lt;30s)</option>
@@ -213,12 +219,15 @@ export function ClipsPage() {
           </div>
 
           {/* Viral Score Selector */}
-          <div className="flex items-center gap-1.5 bg-white border border-[#FFCDD2] px-3 py-1.5 rounded-xl text-xs text-[#616161]">
-            <Filter size={14} className="text-[#EF5350]" />
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 bg-white border border-[#FFCDD2] px-3 py-2 sm:py-1.5 rounded-xl text-xs text-[#616161]">
+            <div className="flex items-center gap-1.5">
+              <Filter size={14} className="text-[#EF5350] flex-shrink-0" />
+              <span className="text-[10px] uppercase font-bold text-[#9E9E9E] sm:hidden">Score:</span>
+            </div>
             <select
               value={scoreFilter}
               onChange={(e) => setScoreFilter(e.target.value)}
-              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer"
+              className="bg-transparent font-medium text-[#1A1A1A] outline-none cursor-pointer text-xs"
             >
               <option value="all">All Viral Scores</option>
               <option value="top">Top Viral (&gt;=90%)</option>
@@ -236,7 +245,7 @@ export function ClipsPage() {
           <p className="text-sm text-[#9E9E9E]">Loading your viral highlights...</p>
         </div>
       ) : clips.length === 0 ? (
-        <div className="text-center py-24 bg-white border border-[#FFCDD2] rounded-3xl">
+        <div className="text-center py-24 bg-white border border-[#FFCDD2] rounded-3xl p-6">
           <Video size={48} className="text-[#FFCDD2] mx-auto mb-4" />
           <h3 className="text-lg font-bold text-[#1A1A1A] mb-1">No clips found</h3>
           <p className="text-sm text-[#9E9E9E] max-w-xs mx-auto">
@@ -246,7 +255,7 @@ export function ClipsPage() {
       ) : (
         <>
           {/* Main Staggered Entrance Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
             <AnimatePresence>
               {clips.map((clip) => (
                 <ClipCard

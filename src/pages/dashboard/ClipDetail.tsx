@@ -105,7 +105,7 @@ export function ClipDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Player */}
         <div className="lg:col-span-1">
-          <div className="aspect-[9/16] max-h-[80vh] bg-black border border-[#FFCDD2] rounded-2xl justify-self-end top-24 overflow-hidden sticky">
+          <div className="aspect-[9/16] w-full max-h-[50vh] lg:max-h-[80vh] bg-black border border-[#FFCDD2] rounded-2xl overflow-hidden sticky top-24 shadow-sm flex items-center justify-center">
             {clip.playback_url ? (
               <video
                 src={clip.playback_url}
@@ -114,7 +114,7 @@ export function ClipDetail() {
                 poster={clip.thumbnail_url || undefined}
               />
             ) : (
-              <div className="text-center">
+              <div className="text-center p-4">
                 <p className="text-xs text-[#9E9E9E] mb-2">
                   Video playback unavailable
                 </p>
@@ -140,7 +140,7 @@ export function ClipDetail() {
 
         {/* Metadata editor */}
         <div className="lg:col-span-2 space-y-5">
-          <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-6 max-w-[80%]">
+          <div className="bg-[#FFFFFF] border border-[#FFCDD2] rounded-2xl p-4 sm:p-6 w-full shadow-sm">
             <h1 className="text-lg font-bold text-[#1A1A1A] mb-5">
               Edit Metadata
             </h1>
@@ -166,7 +166,7 @@ export function ClipDetail() {
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-[#FFEBEE] border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF5F5] border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors"
               />
             </div>
 
@@ -192,7 +192,7 @@ export function ClipDetail() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
-                className="w-full px-4 py-2.5 rounded-xl bg-[#FFEBEE] border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors resize-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#FFF5F5] border border-[#FFCDD2] text-[#1A1A1A] text-sm outline-none focus:border-[#EF5350] transition-colors resize-none"
               />
             </div>
 
@@ -205,7 +205,7 @@ export function ClipDetail() {
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#EF5350]/15 border border-[#EF5350]/30 text-xs text-[#9E9E9E]"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#EF5350]/15 border border-[#EF5350]/30 text-xs text-[#EF5350] font-medium"
                   >
                     #{tag}
                     <button
@@ -225,11 +225,11 @@ export function ClipDetail() {
                     e.key === "Enter" && (e.preventDefault(), addTag())
                   }
                   placeholder="Add tag..."
-                  className="flex-1 px-3 py-1.5 rounded-lg bg-[#FFEBEE] border border-[#FFCDD2] text-[#1A1A1A] text-xs outline-none focus:border-[#EF5350] transition-colors"
+                  className="flex-1 px-3 py-1.5 rounded-lg bg-[#FFF5F5] border border-[#FFCDD2] text-[#1A1A1A] text-xs outline-none focus:border-[#EF5350] transition-colors"
                 />
                 <button
                   onClick={addTag}
-                  className="p-1.5 rounded-lg bg-[#EF5350]/15 border border-[#EF5350]/30 text-[#EF5350] hover:bg-[#EF5350]/25 transition-colors"
+                  className="p-1.5 rounded-lg bg-[#EF5350] text-white hover:bg-[#B71C1C] transition-colors flex-shrink-0"
                 >
                   <Plus size={14} />
                 </button>
@@ -237,18 +237,18 @@ export function ClipDetail() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <motion.button
                 onClick={handleSave}
                 whileTap={{ scale: 0.97 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50 min-h-[42px]"
               >
                 {saved ? <Check size={15} /> : <Save size={15} />}
                 {saved ? "Saved!" : "Save Changes"}
               </motion.button>
               <button
                 disabled
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#FFCDD2] text-sm text-[#9E9E9E] hover:text-[#616161] hover:border-[#EF9090] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#FFCDD2] text-sm text-[#9E9E9E] hover:text-[#616161] hover:border-[#EF9090] transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[42px]"
                 title="Not available yet"
               >
                 <RefreshCw size={14} /> Regenerate
@@ -258,10 +258,10 @@ export function ClipDetail() {
                   if (clip.playback_url)
                     window.open(clip.playback_url, "_blank");
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors disabled:opacity-50 min-h-[42px]"
                 disabled={!clip.playback_url}
               >
-                <Download size={14} />
+                <Download size={14} /> Download
               </button>
             </div>
           </div>
