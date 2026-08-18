@@ -116,19 +116,19 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
           </button>
 
           {/* Left Side: Video Player Container */}
-          <div className="w-full md:w-[380px] bg-black relative flex-shrink-0 flex items-center justify-center p-3 md:p-4 max-h-[35vh] md:max-h-none">
-            <div className={`w-full h-full relative rounded-xl md:rounded-2xl overflow-hidden shadow-inner max-h-[220px] sm:max-h-[300px] md:max-h-[600px] flex items-center justify-center ${aspectRatioClass}`}>
+          <div className="w-full md:w-auto bg-[#0A0A0A] relative flex-shrink-0 flex items-center justify-center p-3 sm:p-4 md:p-6 border-b md:border-b-0 md:border-r border-[#FFCDD2]">
+            <div className={`relative rounded-xl md:rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-lg w-full max-w-[280px] sm:max-w-[320px] md:max-w-[340px] ${aspectRatioClass}`}>
               {clip.playback_url ? (
                 <video
                   src={clip.playback_url}
                   controls
                   autoPlay
                   onLoadedMetadata={handleLoadedMetadata}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover rounded-xl md:rounded-2xl"
                   poster={clip.thumbnail_url || undefined}
                 />
               ) : (
-                <div className="w-full h-full bg-[#1A1A1A] flex flex-col items-center justify-center p-4 text-center">
+                <div className="w-full h-full bg-[#1A1A1A] flex flex-col items-center justify-center p-4 text-center min-h-[200px]">
                   <Play size={32} className="text-[#9E9E9E] mb-2" />
                   <p className="text-xs text-[#9E9E9E]">Playback unavailable</p>
                 </div>
@@ -136,13 +136,13 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
 
               {/* Dynamic Badges Overlay */}
               {clip.duration_seconds && (
-                <div className="absolute bottom-2 right-2 md:bottom-3 md:right-3 px-2 py-0.5 md:py-1 bg-black/60 backdrop-blur-sm rounded-lg text-[10px] md:text-xs text-white font-bold">
+                <div className="absolute bottom-2 right-2 md:bottom-3 md:right-3 px-2 py-0.5 md:py-1 bg-black/70 backdrop-blur-sm rounded-lg text-[10px] md:text-xs text-white font-bold pointer-events-none z-10">
                   {Math.round(clip.duration_seconds)}s
                 </div>
               )}
               {scoreVal > 0 && (
                 <div
-                  className="absolute top-2 left-2 md:top-3 md:left-3 px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-bold backdrop-blur-sm uppercase font-bebas shadow-sm"
+                  className="absolute top-2 left-2 md:top-3 md:left-3 px-2 py-0.5 md:px-2.5 md:py-1 rounded-lg text-[10px] md:text-xs font-bold backdrop-blur-sm uppercase font-bebas shadow-sm pointer-events-none z-10"
                   style={{
                     background: scoreVal >= 90 ? '#22C55EDD' : scoreVal >= 70 ? '#F59E0BDD' : '#EF5350DD',
                     color: '#FFF',
