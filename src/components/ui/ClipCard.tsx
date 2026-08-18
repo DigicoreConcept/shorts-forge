@@ -112,7 +112,7 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
       onClick={() => onPreview(clip)}
     >
       {/* Thumbnail Container */}
-      <div className="relative aspect-[9/16] w-full overflow-hidden bg-black/5 flex-shrink-0">
+      <div className="relative aspect-[9/16] w-full max-h-72 overflow-hidden bg-black/5 flex-shrink-0">
         {clip.thumbnail_url ? (
           <img src={clip.thumbnail_url} alt="Thumbnail" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : clip.playback_url ? (

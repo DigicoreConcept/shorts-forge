@@ -265,7 +265,7 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
 
           {/* Left Side: Video Player Container */}
           <div className="w-full h-full md:h-auto md:w-auto bg-[#0A0A0A] relative flex-1 md:flex-initial flex items-center justify-center p-3 sm:p-4 md:p-6 border-b md:border-b-0 md:border-r border-[#FFCDD2]">
-            <div className={`relative rounded-xl md:rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-lg w-full h-full max-h-[75vh] md:max-h-[600px] max-w-[280px] sm:max-w-[320px] md:max-w-[340px] ${aspectRatioClass}`}>
+            <div className={`relative rounded-xl md:rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-lg w-full h-full md:max-h-[600px] sm:max-w-[320px] md:max-w-[340px] ${aspectRatioClass}`}>
               {clip.playback_url ? (
                 <video
                   src={clip.playback_url}
@@ -304,10 +304,11 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
             {/* Mobile Pull-up Tab Button */}
             <button
               onClick={() => setIsMobileSheetOpen(true)}
-              className="md:hidden absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-[#FFCDD2] rounded-full text-xs font-bold text-[#EF5350] shadow-xl hover:bg-white transition-all active:scale-95"
+              className="md:hidden absolute bottom-2 min-w-32 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-[#FFCDD2] rounded-full text-xs font-bold text-[#EF5350] shadow-xl hover:bg-white transition-all active:scale-95"
             >
-              <span>Edit Metadata</span>
-              <ChevronUp size={14} />
+              {/* <span>Edit Metadata</span>
+
+              <ChevronUp size={14} /> */}
             </button>
           </div>
 
