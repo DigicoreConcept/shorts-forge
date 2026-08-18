@@ -104,7 +104,7 @@ export function ProjectDetail() {
             <VideoIcon size={28} className="text-[#EF5350] sm:size-[32px]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1 leading-tight truncate" title={video.title}>
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1 leading-tight break-words sm:truncate" title={video.title}>
               {video.title}
             </h1>
             <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs font-semibold text-[#616161]">
