@@ -115,7 +115,7 @@ export function ProjectsPage() {
       {/* Header Panel */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">Uploads</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A]">Projects</h1>
           <p className="text-xs sm:text-sm text-[#9E9E9E] mt-1">Manage your source videos and generated clips.</p>
         </div>
         <Link to="/dashboard/upload" className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#EF5350] text-white text-xs sm:text-sm font-semibold hover:bg-[#B71C1C] transition-colors shadow-lg shadow-[#EF5350]/10 w-full sm:w-auto text-center">
