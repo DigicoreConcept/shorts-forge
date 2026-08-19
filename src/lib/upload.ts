@@ -32,7 +32,7 @@ async function uploadChunkWithRetry(
       await new Promise((resolve) => setTimeout(resolve, delay))
       return uploadChunkWithRetry(formData, retries - 1, delay * 2)
     }
-    throw error;
+    throw error
   }
 }
 
@@ -40,25 +40,27 @@ export async function uploadVideoChunks(
   file: File,
   onProgress: (percent: number) => void,
   options?: {
-    uploadId?: string;
-    onPause?: () => void;
-    onResume?: () => void;
-    onChunkUploaded?: (chunkIndex: number, uploadId: string) => void;
+    uploadId?: string
+    concurrency?: number
+    onPause?: () => void
+    onResume?: () => void
+    onChunkUploaded?: (chunkIndex: number, uploadId: string) => void
   }
 ): Promise<{ videoId: string; uploadId: string }> {
-  const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB
+  const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB fixed
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+  const concurrency = options?.concurrency ?? 4
   let uploadId = options?.uploadId
-  let startChunkIndex = 0
+  const uploadedSet = new Set<number>()
 
   // 1. Verify status with server if we have a session cached
   if (uploadId) {
     try {
       const statusRes = await api.get<ApiResponse<{
-        upload_id: string;
-        completed: boolean;
-        video_id?: string;
-        uploaded_chunks: number[];
+        upload_id: string
+        completed: boolean
+        video_id?: string
+        uploaded_chunks: number[]
       }>>(`/v1/media/upload/status?upload_id=${uploadId}`)
 
       if (statusRes.data.success && statusRes.data.data) {
@@ -68,16 +70,12 @@ export async function uploadVideoChunks(
           onProgress(100)
           return {
             videoId: statusData.video_id,
-            uploadId: uploadId
+            uploadId: uploadId,
           }
         }
-        
+
         const uploaded = statusData.uploaded_chunks || []
-        if (uploaded.length > 0) {
-          startChunkIndex = Math.max(...uploaded) + 1
-        } else {
-          startChunkIndex = 0
-        }
+        uploaded.forEach((idx) => uploadedSet.add(idx))
       } else {
         // success is false -> force new session init
         uploadId = undefined
@@ -101,46 +99,67 @@ export async function uploadVideoChunks(
       throw new Error(initRes.data.message || 'Failed to initialize upload')
     }
     uploadId = initRes.data.data.upload_id
-    startChunkIndex = 0
+    uploadedSet.clear()
   }
 
-  // 3. Upload Chunks in order
-  for (let i = startChunkIndex; i < totalChunks; i++) {
+  // 3. Queue-based Concurrent Worker Pool Upload (Concurrency = 4)
+  let nextIndex = 0
+  let completedCount = uploadedSet.size
+
+  if (completedCount > 0) {
+    onProgress(Math.round((completedCount / totalChunks) * 100))
+  }
+
+  async function uploadOneChunk(index: number) {
     // Check if network is offline in real-time
     if (!window.navigator.onLine) {
       if (options?.onPause) options.onPause()
-      // Wait inside a loop until back online
       while (!window.navigator.onLine) {
         await new Promise((resolve) => setTimeout(resolve, 1000))
       }
       if (options?.onResume) options.onResume()
     }
 
-    const start = i * CHUNK_SIZE
+    const start = index * CHUNK_SIZE
     const end = Math.min(start + CHUNK_SIZE, file.size)
-    const chunk = file.slice(start, end)
+    const chunkBlob = file.slice(start, end) // Lazy slice right when worker needs it
 
     const formData = new FormData()
-    formData.append('upload_id', uploadId)
-    formData.append('chunk_index', i.toString())
-    formData.append('chunk', chunk, file.name)
+    formData.append('upload_id', uploadId!)
+    formData.append('chunk_index', index.toString())
+    formData.append('chunk', chunkBlob, file.name)
 
     // Execute chunk upload using retry helper
     await uploadChunkWithRetry(formData)
 
-    // Callback on chunk completion (for caching state)
+    // Callback on chunk completion (for caching session state)
     if (options?.onChunkUploaded) {
-      options.onChunkUploaded(i, uploadId)
+      options.onChunkUploaded(index, uploadId!)
     }
 
-    // Update progress percentage
-    const percent = Math.round(((i + 1) / totalChunks) * 100)
+    completedCount++
+    const percent = Math.round((completedCount / totalChunks) * 100)
     onProgress(percent)
   }
 
+  async function worker() {
+    while (nextIndex < totalChunks) {
+      const currentIndex = nextIndex++
+      if (uploadedSet.has(currentIndex)) {
+        continue
+      }
+      await uploadOneChunk(currentIndex)
+    }
+  }
+
+  // Launch worker pool with concurrency cap
+  const workerCount = Math.min(concurrency, Math.max(1, totalChunks - uploadedSet.size))
+  const workers = Array.from({ length: workerCount }, () => worker())
+  await Promise.all(workers)
+
   // 4. Complete Upload
   const completeForm = new FormData()
-  completeForm.append('upload_id', uploadId)
+  completeForm.append('upload_id', uploadId!)
 
   const completeRes = await api.post<ApiResponse<UploadCompleteResponse>>('/v1/media/upload/complete', completeForm)
 
@@ -150,7 +169,6 @@ export async function uploadVideoChunks(
 
   return {
     videoId: completeRes.data.data.video_id,
-    uploadId: uploadId,
+    uploadId: uploadId!,
   }
 }
-

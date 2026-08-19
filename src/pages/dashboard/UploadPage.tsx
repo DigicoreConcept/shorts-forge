@@ -126,6 +126,7 @@ export function UploadPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Immediate synchronous UI feedback before any await
     setSubmitting(true)
     setError('')
     setUploadProgress(0)
@@ -138,10 +139,22 @@ export function UploadPage() {
       if (mode === 'file' && file) {
         const fingerprint = `${file.name}_${file.size}_${file.lastModified}`
         
+        // Fast metadata extraction if not yet loaded
+        let mediaMeta = metadata
+        if (!mediaMeta) {
+          try {
+            mediaMeta = await getVideoMetadata(file)
+            setMetadata(mediaMeta)
+          } catch (mErr) {
+            console.warn('Fast metadata extraction skipped:', mErr)
+          }
+        }
+        
         const uploadRes = await uploadVideoChunks(file, (percent) => {
           setUploadProgress(percent)
         }, {
           uploadId: activeUploadId || undefined,
+          concurrency: 4,
           onPause: () => setUploadPaused(true),
           onResume: () => setUploadPaused(false),
           onChunkUploaded: (index, resolvedUploadId) => {
