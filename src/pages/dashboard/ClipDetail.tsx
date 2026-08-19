@@ -29,6 +29,26 @@ export function ClipDetail() {
   const [newTag, setNewTag] = useState("");
   const [copied, setCopied] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!clip) return;
+    setDownloading(true);
+    try {
+      const res = await api.get(`/v1/clips/${clip.id}/download`);
+      if (res.data?.success && (res.data?.data?.download_url || res.data?.data?.url)) {
+        window.open(res.data.data.download_url || res.data.data.url, "_blank");
+        return;
+      }
+    } catch (err) {
+      console.error("Failed to fetch clip download URL:", err);
+    } finally {
+      setDownloading(false);
+    }
+    if (clip.playback_url) {
+      window.open(clip.playback_url, "_blank");
+    }
+  };
 
   useEffect(() => {
     const fetchClip = async () => {
@@ -254,14 +274,11 @@ export function ClipDetail() {
                 <RefreshCw size={14} /> Regenerate
               </button>
               <button
-                onClick={() => {
-                  if (clip.playback_url)
-                    window.open(clip.playback_url, "_blank");
-                }}
+                onClick={handleDownload}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors disabled:opacity-50 min-h-[42px]"
-                disabled={!clip.playback_url}
+                disabled={downloading || !clip.playback_url}
               >
-                <Download size={14} /> Download
+                <Download size={14} /> {downloading ? "Downloading..." : "Download"}
               </button>
             </div>
           </div>

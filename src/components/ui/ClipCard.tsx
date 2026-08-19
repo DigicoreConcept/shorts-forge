@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Play, Download, Trash2 } from 'lucide-react'
 import { Clip } from '@/types'
+import { api } from '@/lib/api'
 
 // Reusable Dynamic Canvas-based Lazy-loaded Thumbnail Generator
 export function VideoThumbnail({ src, fallbackColor }: { src: string; fallbackColor: string }) {
@@ -95,8 +96,22 @@ export function ClipCard({ clip, onPreview, onDelete }: ClipCardProps) {
   const isHighViral = scoreVal >= 90
   const isMidViral = scoreVal >= 70 && scoreVal < 90
 
-  const handleDownload = (e: React.MouseEvent) => {
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation()
+    setDownloading(true)
+    try {
+      const res = await api.get(`/v1/clips/${clip.id}/download`)
+      if (res.data?.success && (res.data?.data?.download_url || res.data?.data?.url)) {
+        window.open(res.data.data.download_url || res.data.data.url, '_blank')
+        return
+      }
+    } catch (err) {
+      console.error('Failed to fetch clip download URL:', err)
+    } finally {
+      setDownloading(false)
+    }
     if (clip.playback_url) {
       window.open(clip.playback_url, '_blank')
     }

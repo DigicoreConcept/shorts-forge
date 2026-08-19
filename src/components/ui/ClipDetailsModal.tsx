@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Play, Download, Save, RefreshCw, Copy, Check, Plus, ChevronUp, ChevronDown } from 'lucide-react'
 import { Clip } from '@/types'
+import { api } from '@/lib/api'
 import { VideoPlayer } from './VideoPlayer'
 
 interface ClipDetailsModalProps {
@@ -19,7 +20,27 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
   const [copied, setCopied] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [downloading, setDownloading] = useState(false)
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false)
+
+  const handleDownload = async () => {
+    if (!clip) return
+    setDownloading(true)
+    try {
+      const res = await api.get(`/v1/clips/${clip.id}/download`)
+      if (res.data?.success && (res.data?.data?.download_url || res.data?.data?.url)) {
+        window.open(res.data.data.download_url || res.data.data.url, '_blank')
+        return
+      }
+    } catch (err) {
+      console.error('Failed to fetch clip download URL:', err)
+    } finally {
+      setDownloading(false)
+    }
+    if (clip.playback_url) {
+      window.open(clip.playback_url, '_blank')
+    }
+  }
 
   // Sync inputs with active clip
   useEffect(() => {
@@ -229,13 +250,11 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
         )}
         
         <button
-          onClick={() => {
-            if (clip.playback_url) window.open(clip.playback_url, '_blank')
-          }}
-          className={`flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors min-h-[42px] ${hasChanges ? '' : 'w-full'}`}
-          disabled={!clip.playback_url}
+          onClick={handleDownload}
+          disabled={downloading || !clip.playback_url}
+          className={`flex items-center justify-center gap-2 px-4 py-2.5 sm:py-3 rounded-xl border border-[#22C55E]/30 bg-[#22C55E]/10 text-sm font-semibold text-[#22C55E] hover:bg-[#22C55E]/20 transition-colors disabled:opacity-50 min-h-[42px] ${hasChanges ? '' : 'w-full'}`}
         >
-          <Download size={15} /> Download
+          <Download size={15} /> {downloading ? 'Downloading...' : 'Download'}
         </button>
       </div>
     </div>
