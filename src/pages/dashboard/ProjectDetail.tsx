@@ -52,7 +52,7 @@ export function ProjectDetail() {
   const handleDeleteClip = async (clipId: string) => {
     if (confirm('Are you sure you want to delete this clip?')) {
       try {
-        await api.post(`/v1/clips/${clipId}/delete`);
+        await api.delete(`/v1/clips/${clipId}`);
         setClips((prev) => prev.filter((c) => c.id !== clipId));
       } catch (err) {
         console.error('Failed to delete clip:', err);
