@@ -296,7 +296,7 @@ export function VideoPlayer({
                     <Gauge size={14} className="text-[#EF5350]" />
                     <span>Playback Speed</span>
                   </div>
-                  <div className="flex items-center gap-1 text-[#9E9E9E]">
+                  <div className="pl-2 flex items-center text-[#9E9E9E]">
                     <span>{playbackRate === 1 ? 'Normal' : `${playbackRate}x`}</span>
                     <ChevronRight size={12} />
                   </div>
