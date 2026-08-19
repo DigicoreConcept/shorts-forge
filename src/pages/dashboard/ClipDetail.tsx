@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import { api } from "@/lib/api";
 import { Clip } from "@/types";
+import { VideoPlayer } from "@/components/ui/VideoPlayer";
 
 export function ClipDetail() {
   const { id } = useParams();
@@ -107,11 +108,10 @@ export function ClipDetail() {
         <div className="lg:col-span-1">
           <div className="aspect-[9/16] w-full max-h-[50vh] lg:max-h-[80vh] bg-black border border-[#FFCDD2] rounded-2xl overflow-hidden sticky top-24 shadow-sm flex items-center justify-center">
             {clip.playback_url ? (
-              <video
+              <VideoPlayer
                 src={clip.playback_url}
-                controls
-                className="w-full h-full object-contain"
                 poster={clip.thumbnail_url || undefined}
+                objectFit="contain"
               />
             ) : (
               <div className="text-center p-4">

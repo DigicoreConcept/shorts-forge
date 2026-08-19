@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Play, Download, Save, RefreshCw, Copy, Check, Plus, ChevronUp, ChevronDown } from 'lucide-react'
 import { Clip } from '@/types'
+import { VideoPlayer } from './VideoPlayer'
 
 interface ClipDetailsModalProps {
   clip: Clip | null
@@ -267,13 +268,12 @@ export function ClipDetailsModal({ clip, onClose, onUpdate }: ClipDetailsModalPr
           <div className="w-full h-full md:h-auto md:w-auto bg-[#0A0A0A] relative flex-1 md:flex-initial flex items-center justify-center p-3 sm:p-4 md:p-6 border-b md:border-b-0 md:border-r border-[#FFCDD2]">
             <div className={`relative rounded-xl md:rounded-2xl overflow-hidden bg-black flex items-center justify-center shadow-lg w-full h-full md:max-h-[600px] sm:max-w-[320px] md:max-w-[340px] ${aspectRatioClass}`}>
               {clip.playback_url ? (
-                <video
+                <VideoPlayer
                   src={clip.playback_url}
-                  controls
-                  autoPlay
-                  onLoadedMetadata={handleLoadedMetadata}
-                  className="w-full h-full object-cover rounded-xl md:rounded-2xl"
                   poster={clip.thumbnail_url || undefined}
+                  autoPlay
+                  objectFit="cover"
+                  onLoadedMetadata={handleLoadedMetadata}
                 />
               ) : (
                 <div className="w-full h-full bg-[#1A1A1A] flex flex-col items-center justify-center p-4 text-center min-h-[200px]">
