@@ -43,16 +43,16 @@ function WaveformAnimation() {
 
 function ClipMaterializeAnimation() {
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-12 h-16 rounded-lg bg-[#FFFFFF] border border-[#EF5350]/30 overflow-hidden"
+          className="w-10 h-14 sm:w-12 sm:h-16 rounded-lg bg-[#FFFFFF] border border-[#EF5350]/30 overflow-hidden"
           initial={{ opacity: 0, scale: 0.8, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: i * 0.3, duration: 0.4 }}
         >
-          <div className="w-full h-10 bg-gradient-to-br from-[#EF5350]/20 to-[#C62828]/20" />
+          <div className="w-full h-7 sm:h-10 bg-gradient-to-br from-[#EF5350]/20 to-[#C62828]/20" />
           <div className="p-1 space-y-0.5">
             <div className="h-1 bg-[#FFCDD2] rounded-full" />
             <div className="h-1 bg-[#FFCDD2] rounded-full w-3/4" />
@@ -250,35 +250,35 @@ export function ProcessingPage() {
 
   if (cancelled || failed) {
     return (
-      <div className="fixed inset-0 bg-[#FFEBEE] flex items-center justify-center">
+      <div className="min-h-screen w-full bg-[#FFEBEE] flex flex-col items-center justify-center p-4 sm:p-6 overflow-y-auto relative">
         {/* Back to Dashboard Navigation */}
-        <div className="absolute top-6 left-6 z-50">
+        <div className="w-full max-w-lg mb-6 sm:mb-0 sm:absolute sm:top-6 sm:left-6 sm:w-auto z-50">
           <Link 
             to="/dashboard"
-            className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md border border-[#FFCDD2] rounded-xl text-sm font-semibold text-[#1A1A1A] hover:bg-white hover:border-[#EF9090] hover:text-[#EF5350] transition-all shadow-sm"
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-[#FFCDD2] rounded-xl text-xs sm:text-sm font-semibold text-[#1A1A1A] hover:bg-white hover:border-[#EF9090] hover:text-[#EF5350] transition-all shadow-sm"
           >
             <ArrowLeft size={16} />
             Back to Dashboard
           </Link>
         </div>
-        <div className="text-center max-w-md px-6">
+        <div className="text-center max-w-md w-full px-4 sm:px-6 my-auto">
           <XCircle size={48} className="text-[#EF4444] mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-[#1A1A1A] mb-2">
+          <h2 className="text-lg sm:text-xl font-bold text-[#1A1A1A] mb-2">
             {failed ? 'Job Failed' : 'Job Cancelled'}
           </h2>
-          <p className="text-[#9E9E9E] mb-6">
+          <p className="text-xs sm:text-sm text-[#9E9E9E] mb-6 leading-relaxed">
             {failed
               ? (errorMessage || 'The processing job faced an error during execution.')
               : 'The processing job was cancelled.'}
           </p>
-          <div className="flex items-center justify-center gap-3">
-            <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 rounded-xl border border-[#FFCDD2] bg-white text-[#1A1A1A] text-sm font-semibold hover:border-[#EF9090] hover:text-[#EF5350] transition-all">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+            <button onClick={() => navigate('/dashboard')} className="px-5 py-2.5 rounded-xl border border-[#FFCDD2] bg-white text-[#1A1A1A] text-xs sm:text-sm font-semibold hover:border-[#EF9090] hover:text-[#EF5350] transition-all">
               Back to Dashboard
             </button>
             <button
               onClick={handleRetry}
               disabled={isRetrying}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#EF5350] text-white text-xs sm:text-sm font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50"
             >
               <RotateCw size={14} className={isRetrying ? 'animate-spin' : ''} />
               {isRetrying ? 'Retrying...' : 'Retry Job'}
@@ -290,21 +290,21 @@ export function ProcessingPage() {
   }
 
   return (
-    <div className="fixed inset-0 bg-[#FFF5F5] flex items-center justify-center overflow-hidden">
+    <div className="min-h-screen w-full bg-[#FFF5F5] flex flex-col items-center justify-start sm:justify-center p-3 sm:p-6 overflow-y-auto relative">
       {/* Back to Dashboard Navigation */}
-      <div className="absolute top-6 left-6 z-50">
+      <div className="w-full max-w-lg mb-4 sm:mb-0 sm:absolute sm:top-6 sm:left-6 sm:w-auto z-50">
         <Link 
           to="/dashboard"
-          className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-md border border-[#FFCDD2] rounded-xl text-sm font-semibold text-[#1A1A1A] hover:bg-white hover:border-[#EF9090] hover:text-[#EF5350] transition-all shadow-sm"
+          className="inline-flex items-center gap-2 px-3.5 py-2 bg-white/90 backdrop-blur-md border border-[#FFCDD2] rounded-xl text-xs sm:text-sm font-semibold text-[#1A1A1A] hover:bg-white hover:border-[#EF9090] hover:text-[#EF5350] transition-all shadow-sm"
         >
           <ArrowLeft size={16} />
           Back to Dashboard
         </Link>
       </div>
       {/* Background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#EF5350]/6 blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#C62828]/5 rounded-full blur-3xl" />
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full bg-[#EF5350]/6 blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-64 sm:w-96 h-64 sm:h-96 bg-[#C62828]/5 rounded-full blur-3xl" />
         {!completed && (
           <>
             {Array.from({ length: 8 }).map((_, i) => (
@@ -320,18 +320,11 @@ export function ProcessingPage() {
         )}
       </div>
 
-      <div className="relative z-10 w-full max-w-lg px-6">
+      <div className="relative z-10 w-full max-w-lg px-2 sm:px-4 py-4 sm:py-8 my-auto">
         {/* Header */}
-        <div className="text-center mb-10">
-          {/* <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-[#EF5350] flex items-center justify-center shadow-lg shadow-[#EF5350]/30">
-              <Zap size={14} className="text-white fill-white" />
-            </div>
-            <span className="font-bold text-[#1A1A1A]">Excido</span>
-          </div> */}
-
+        <div className="text-center mb-6 sm:mb-10">
           {/* Logo */}
-          <div className="mx-auto mb-4 h-auto w-32">
+          <div className="mx-auto mb-3 sm:mb-4 h-auto w-24 sm:w-32">
               <img
                 src="/reel-logo-black.png"
                 className="h-full w-full object-contain"
@@ -342,17 +335,17 @@ export function ProcessingPage() {
           <AnimatePresence mode="wait">
             {completed ? (
               <motion.div key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-2xl font-bold text-[#1A1A1A] mb-1">Clips Ready! 🎉</h1>
-                <p className="text-sm text-[#9E9E9E]">Redirecting you to your clips...</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1">Clips Ready! 🎉</h1>
+                <p className="text-xs sm:text-sm text-[#9E9E9E]">Redirecting you to your clips...</p>
               </motion.div>
             ) : (
               <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <h1 className="text-2xl font-bold text-[#1A1A1A] mb-1">Processing Your Video</h1>
+                <h1 className="text-xl sm:text-2xl font-bold text-[#1A1A1A] mb-1">Processing Your Video</h1>
                 <div className="flex flex-col items-center justify-center gap-2 mt-2">
-                  <p className="text-xs text-[#9E9E9E] flex items-center justify-center gap-1.5">
+                  <p className="text-[11px] sm:text-xs text-[#9E9E9E] flex items-center justify-center gap-1.5 flex-wrap">
                     <Clock size={11} /> {formatTime(elapsed)} elapsed · Job {jobId?.slice(0, 12)}
                   </p>
-                  <span className="text-[11px] text-[#616161] bg-white/50 px-3 py-1.5 rounded-lg border border-[#FFCDD2]/50">
+                  <span className="text-[10px] sm:text-[11px] text-[#616161] bg-white/70 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-[#FFCDD2]/50 text-center">
                     You can safely leave this page. We'll continue in the background.
                   </span>
                 </div>
@@ -362,12 +355,12 @@ export function ProcessingPage() {
         </div>
 
         {/* Overall progress bar */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center justify-between text-xs text-[#9E9E9E] mb-2">
             <span>Overall Progress</span>
-            <span>{Math.round(overallProgress)}%</span>
+            <span className="font-semibold">{Math.round(overallProgress)}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-[#FFFFFF] overflow-hidden">
+          <div className="h-1.5 sm:h-2 rounded-full bg-[#FFFFFF] overflow-hidden shadow-inner">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-[#EF5350] to-[#C62828]"
               animate={{ width: `${overallProgress}%` }}
@@ -377,7 +370,7 @@ export function ProcessingPage() {
         </div>
 
         {/* Steps */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2.5 sm:space-y-3 mb-6 sm:mb-8">
           {STEPS.map((step, i) => {
             const state = stepStates[i]
             const isActive = state === 'active'
@@ -389,16 +382,16 @@ export function ProcessingPage() {
                 initial={{ opacity: 0, x: -16 }}
                 animate={{ opacity: state === 'pending' ? 0.35 : 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.05 }}
-                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
+                className={`flex items-start sm:items-center gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl border transition-all ${
                   isActive
-                    ? 'border-[#EF5350]/50 bg-[#EF5350]/8'
+                    ? 'border-[#EF5350]/50 bg-[#EF5350]/8 shadow-sm'
                     : isDone
                     ? 'border-[#22C55E]/20 bg-[#22C55E]/5'
                     : 'border-[#FFCDD2] bg-[#FFFFFF]'
                 }`}
               >
                 {/* Icon */}
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 ${
                   isActive ? 'bg-[#EF5350]/20' : isDone ? 'bg-[#22C55E]/15' : 'bg-[#FFCDD2]'
                 }`}>
                   {isDone ? (
@@ -413,11 +406,11 @@ export function ProcessingPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <p className={`text-sm font-semibold ${isDone ? 'text-[#22C55E]' : isActive ? 'text-[#1A1A1A]' : 'text-[#9E9E9E]'}`}>
+                    <p className={`text-xs sm:text-sm font-semibold ${isDone ? 'text-[#22C55E]' : isActive ? 'text-[#1A1A1A]' : 'text-[#9E9E9E]'}`}>
                       {step.label}
                     </p>
                     {isActive && (
-                      <span className="text-xs text-[#EF5350]">{Math.round(stepProgress)}%</span>
+                      <span className="text-xs text-[#EF5350] font-semibold">{Math.round(stepProgress)}%</span>
                     )}
                   </div>
 
@@ -452,7 +445,7 @@ export function ProcessingPage() {
                   )}
 
                   {!isActive && !isDone && (
-                    <p className="text-xs text-[#9E9E9E]">{step.sublabel}</p>
+                    <p className="text-xs text-[#9E9E9E] truncate">{step.sublabel}</p>
                   )}
                 </div>
               </motion.div>
@@ -469,7 +462,7 @@ export function ProcessingPage() {
               className="text-center"
             >
               <SuccessBurst />
-              <p className="text-sm text-[#616161] mt-4">Taking you to your clips now...</p>
+              <p className="text-xs sm:text-sm text-[#616161] mt-4">Taking you to your clips now...</p>
             </motion.div>
           )}
         </AnimatePresence>
