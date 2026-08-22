@@ -62,9 +62,9 @@ export function Privacy() {
             </div>
 
             <div>
-              <h2 className="text-2xl font-bold mb-4 font-bebas tracking-wide">2. How We Process Video Content</h2>
+              <h2 className="text-2xl font-bold mb-4 font-bebas tracking-wide">2. How We Process & Retain Video Content</h2>
               <p className="text-base text-[#616161] leading-relaxed">
-                When you upload a video to Excido, the audio stream is extracted and processed using OpenAI Whisper to generate text transcripts. These transcripts are analyzed by language models (Mistral AI and Gemini AI) to identify key narrative hooks. ffmpeg is used locally on our backend servers to slice your video. We do not store your original long-form video files longer than necessary to complete the processing pipeline.
+                When you upload a video to Excido, the audio stream is extracted and processed using OpenAI Whisper to generate text transcripts. These transcripts are analyzed by language models (Mistral AI and Gemini AI) to identify key narrative hooks. ffmpeg is used locally on our backend servers to slice your video. Original long-form video files are retained by default for a minimum of 15 days—or for a custom duration (including immediate deletion) configured in your account settings. This allows you to run multiple clipping and processing jobs on the same source video without having to re-upload the file. After your set retention period, original video files are automatically and permanently deleted.
               </p>
             </div>
 
